@@ -1,8 +1,11 @@
 package com.example.notesapp;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import java.util.ArrayList;
 
-public class NoteDataClass {
+public class NoteDataClass implements Parcelable {
     private String name;
     private String description;
     private String dateOfCreation;
@@ -14,6 +17,25 @@ public class NoteDataClass {
         this.dateOfCreation = dateOfCreation;
         this.noteText = noteText;
     }
+
+    protected NoteDataClass(Parcel in) {
+        name = in.readString();
+        description = in.readString();
+        dateOfCreation = in.readString();
+        noteText = in.readString();
+    }
+
+    public static final Creator<NoteDataClass> CREATOR = new Creator<NoteDataClass>() {
+        @Override
+        public NoteDataClass createFromParcel(Parcel in) {
+            return new NoteDataClass(in);
+        }
+
+        @Override
+        public NoteDataClass[] newArray(int size) {
+            return new NoteDataClass[size];
+        }
+    };
 
     public String getName() {
         return name;
@@ -45,5 +67,18 @@ public class NoteDataClass {
 
     public void setNoteText(String noteText) {
         this.noteText = noteText;
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(name);
+        dest.writeString(description);
+        dest.writeString(dateOfCreation);
+        dest.writeString(noteText);
     }
 }

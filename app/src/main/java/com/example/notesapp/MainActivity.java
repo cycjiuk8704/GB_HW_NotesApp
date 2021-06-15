@@ -10,10 +10,6 @@ import android.widget.TextView;
 public class MainActivity extends AppCompatActivity {
 
     NoteListFragment noteListFrag;
-    private TextView noteName;
-    private TextView noteDescription;
-    private TextView noteDateOfCreation;
-    private TextView noteText;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -23,21 +19,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void init() {
-        NoteDataClass noteOne = new NoteDataClass("note1", "someNoteDescrikption1", "date", "there might be your text");
+        NoteDataClass noteOne = new NoteDataClass("note1", "someNoteDescription1", "date", "there might be your text");
 
-        noteListFrag = new NoteListFragment();
-
+        noteListFrag = NoteListFragment.newInstance(noteOne);
 
         FragmentTransaction f1Trans = getSupportFragmentManager().beginTransaction();
         f1Trans.add(R.id.fragmentContainerView, noteListFrag);
         f1Trans.commit();
 
-        noteName = findViewById(R.id.noteName);
-        noteDescription = findViewById(R.id.noteDescription);
-        noteDateOfCreation = findViewById(R.id.noteDate);
-
-        noteName.setText(noteOne.getName());
-        noteDescription.setText(noteOne.getDescription());
-        noteDateOfCreation.setText(noteOne.getDateOfCreation());
     }
 }

@@ -13,7 +13,7 @@
         android:textAlignment="center"
         android:textSize="@dimen/capeTextSize"/>
 
-    <androidx.fragment.app.FragmentContainerView
+    <fragment
         android:id="@+id/fragmentContainerView"
         android:name="com.example.notesapp.NoteListFragment"
         android:layout_width="match_parent"
