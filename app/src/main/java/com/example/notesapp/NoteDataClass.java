@@ -3,8 +3,6 @@ package com.example.notesapp;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import java.util.ArrayList;
-
 public class NoteDataClass implements Parcelable {
     private String name;
     private String description;

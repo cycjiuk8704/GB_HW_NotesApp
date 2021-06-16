@@ -1,4 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <dimen name="capeTextSize">22sp</dimen>
+    <dimen name="fragment_margin_top">25dp</dimen>
 </resources>

@@ -4,17 +4,20 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".MainActivity">
+    tools:context=".NoteTextFragment">
 
+    <!-- TODO: Update blank fragment layout -->
     <TextView
-        android:id="@+id/textView"
+        style="@style/noteCapeStyle"
+        android:id="@+id/noteName"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/notepad"
-        style="@style/noteCapeStyle"/>
+        android:text="" />
 
-    <androidx.fragment.app.FragmentContainerView
-        android:id="@+id/fragmentContainerView"
+    <TextView
+        android:id="@+id/noteText"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        android:text="" />
+
 </LinearLayout>
