@@ -17,14 +17,12 @@
     android:layout_marginTop="@dimen/fragment_margin_top">
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/fragmentContainerView2"
-        android:name="com.example.notesapp.NoteListFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_weight="1"/>
 
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/fragmentContainerView3"
-        android:name="com.example.notesapp.NoteTextFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_weight="1"/>
