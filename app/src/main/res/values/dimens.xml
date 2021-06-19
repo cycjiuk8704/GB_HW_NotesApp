@@ -2,4 +2,6 @@
 <resources>
     <dimen name="fragment_margin_top">25dp</dimen>
     <dimen name="textFieldTextSize">24sp</dimen>
+    <dimen name="nav_header_height">200dp</dimen>
+    <dimen name="nav_header_dimen">42sp</dimen>
 </resources>

@@ -1,14 +1,18 @@
 package com.example.notesapp;
 
+import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.os.Bundle;
-
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.widget.PopupMenu;
 
 public class NoteListFragment extends BaseFragment {
 
@@ -36,20 +40,79 @@ public class NoteListFragment extends BaseFragment {
                              Bundle savedInstanceState) {
 
         if (getArguments() != null) {
-            noteData = (NoteDataClass) getArguments().getParcelable(ARG_INDEX);
+            noteData = getArguments().getParcelable(ARG_INDEX);
         }
 
         View v = inflater.inflate(R.layout.fragment_note_list, null);
-        TextView nameTV = (TextView) v.findViewById(R.id.noteName);
-        TextView descriptionTV = (TextView) v.findViewById(R.id.noteDescription);
-        TextView dateTV = (TextView) v.findViewById(R.id.noteDate);
+        initPopupMenu(v);
+        TextView nameTV = v.findViewById(R.id.noteName);
+        TextView descriptionTV = v.findViewById(R.id.noteDescription);
+        TextView dateTV = v.findViewById(R.id.noteDate);
         nameTV.setText(noteData.getName());
         descriptionTV.setText(noteData.getDescription());
         dateTV.setText(noteData.getDateOfCreation());
 
-        LinearLayout linearLayout1 = (LinearLayout) v.findViewById(R.id.noteField);
-        linearLayout1.setOnClickListener(view -> requireNavigator().showNoteDetails(noteData));
+//        LinearLayout linearLayout1 = (LinearLayout) v.findViewById(R.id.noteField);
+//        linearLayout1.setOnClickListener(view -> requireNavigator().showNoteDetails(noteData));
 
         return v;
+    }
+    @SuppressLint("ClickableViewAccessibility")
+    private void initPopupMenu(View view) {
+        LinearLayout linearLayout1 = view.findViewById(R.id.noteField);
+        linearLayout1.setOnTouchListener(new View.OnTouchListener() {
+            long startTime;
+
+            @SuppressLint("NonConstantResourceId")
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                switch (event.getAction()) {
+                    case MotionEvent.ACTION_DOWN:
+                        startTime = System.currentTimeMillis();
+                        break;
+                    case MotionEvent.ACTION_MOVE:
+                        break;
+                    case MotionEvent.ACTION_UP:
+                    case MotionEvent.ACTION_CANCEL:
+                        if( ((System.currentTimeMillis() - startTime) / 1000) >= 1 )
+                        {
+                            Activity activity = requireActivity();
+                            PopupMenu popupMenu = new PopupMenu(activity, v);
+                            activity.getMenuInflater().inflate(R.menu.popup_menu, popupMenu.getMenu());
+                            popupMenu.setOnMenuItemClickListener(item -> {
+                                int id = item.getItemId();
+                                switch (id) {
+                                    case R.id.add_popup:
+                                        Toast.makeText(getContext(), "Add new note", Toast.LENGTH_SHORT).show();
+                                        return true;
+                                    case R.id.delete_popup:
+                                        Toast.makeText(getContext(), "Delete note", Toast.LENGTH_SHORT).show();
+                                        return true;
+                                    case R.id.open_popup:
+                                        requireNavigator().showNoteDetails(noteData);
+                                        return true;
+                                }
+                                return true;
+                            });
+                            popupMenu.show();
+                        } else {
+                            requireNavigator().showNoteDetails(noteData);
+                        }
+                        break;
+                }
+                return true;
+            }
+        });
+
+
+
+
+
+
+
+
+
+
+
     }
 }

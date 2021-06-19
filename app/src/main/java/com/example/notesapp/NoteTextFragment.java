@@ -10,7 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-public class NoteTextFragment extends Fragment {
+public class NoteTextFragment extends BaseFragment {
 
     private static final String ARG_INDEX = "index";
     private NoteDataClass noteDataClass;
