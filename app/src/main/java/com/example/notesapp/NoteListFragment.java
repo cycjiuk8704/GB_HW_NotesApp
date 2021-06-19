@@ -52,8 +52,6 @@ public class NoteListFragment extends BaseFragment {
         descriptionTV.setText(noteData.getDescription());
         dateTV.setText(noteData.getDateOfCreation());
 
-//        LinearLayout linearLayout1 = (LinearLayout) v.findViewById(R.id.noteField);
-//        linearLayout1.setOnClickListener(view -> requireNavigator().showNoteDetails(noteData));
 
         return v;
     }

@@ -8,5 +8,8 @@
     <string name="open">Open</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
-    <string name="fragment_navigation">Fragment Navigation</string>
+    <string name="fragment_navigation">Notes App menu</string>
+    <string name="drawer_surname">UserSurname</string>
+    <string name="drawer_username">UserName</string>
+    <string name="about">About</string>
 </resources>

@@ -114,6 +114,9 @@ public class MainActivity extends AppCompatActivity implements INavigator {
             case R.id.action_add:
                 Toast.makeText(MainActivity.this, id + "there might be adding note fragment", Toast.LENGTH_SHORT).show();
                 return true;
+            case R.id.action_about:
+                Toast.makeText(MainActivity.this, id + "there might be information about application", Toast.LENGTH_SHORT).show();
+                return true;
         }
         return false;
     }
