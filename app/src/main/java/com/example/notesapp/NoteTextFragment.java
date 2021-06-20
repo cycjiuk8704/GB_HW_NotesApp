@@ -10,23 +10,23 @@ import androidx.annotation.NonNull;
 
 public class NoteTextFragment extends BaseFragment {
 
-    private static final String ARG_INDEX = "index";
+    private static final String NOTE_STATE = "state";
     private NoteDataClass noteDataClass;
 
     public static NoteTextFragment newInstance(NoteDataClass noteDataClass) {
-        NoteTextFragment n = new NoteTextFragment();
+        NoteTextFragment noteTextFragment = new NoteTextFragment();
 
         Bundle args = new Bundle();
-        args.putParcelable(ARG_INDEX, noteDataClass);
-        n.setArguments(args);
-        return n;
+        args.putParcelable(NOTE_STATE, noteDataClass);
+        noteTextFragment.setArguments(args);
+        return noteTextFragment;
     }
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         if (getArguments() != null) {
-            noteDataClass = getArguments().getParcelable(ARG_INDEX);
+            noteDataClass = getArguments().getParcelable(NOTE_STATE);
         }
 
         View v = inflater.inflate(R.layout.fragment_note_text, null);
