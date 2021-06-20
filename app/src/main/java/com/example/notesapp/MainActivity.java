@@ -14,10 +14,13 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 
 import com.google.android.material.navigation.NavigationView;
 
 public class MainActivity extends AppCompatActivity implements INavigator {
+
+    private int stackCount = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,7 +55,6 @@ public class MainActivity extends AppCompatActivity implements INavigator {
     @Override
     public void showNoteDetails(@NonNull NoteDataClass note) {
         if (isPortrait()) {
-            getSupportFragmentManager().beginTransaction().addToBackStack(null).commit();
             showFragment(NoteTextFragment.newInstance(note), R.id.fragmentContainerView);
         } else {
             showFragment(NoteTextFragment.newInstance(note), R.id.fragmentContainerView3);
@@ -60,10 +62,14 @@ public class MainActivity extends AppCompatActivity implements INavigator {
     }
 
     private void showFragment(@NonNull Fragment fragment, int fragmentContainerView) {
-        getSupportFragmentManager()
-                .beginTransaction()
-                .replace(fragmentContainerView, fragment)
-                .commit();
+        FragmentTransaction fTrans = getSupportFragmentManager()
+                .beginTransaction().replace(fragmentContainerView, fragment);
+        if (stackCount > 0) {
+            fTrans.addToBackStack(null);
+        }
+        fTrans.commit();
+
+        stackCount++;
     }
 
     private void initDrawer(Toolbar toolbar) {
