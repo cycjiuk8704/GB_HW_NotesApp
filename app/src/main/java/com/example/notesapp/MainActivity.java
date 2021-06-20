@@ -14,13 +14,10 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentTransaction;
 
 import com.google.android.material.navigation.NavigationView;
 
 public class MainActivity extends AppCompatActivity implements INavigator {
-
-    private int stackCount = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,14 +59,11 @@ public class MainActivity extends AppCompatActivity implements INavigator {
     }
 
     private void showFragment(@NonNull Fragment fragment, int fragmentContainerView) {
-        FragmentTransaction fTrans = getSupportFragmentManager()
-                .beginTransaction().replace(fragmentContainerView, fragment);
-        if (stackCount > 0) {
-            fTrans.addToBackStack(null);
-        }
-        fTrans.commit();
-
-        stackCount++;
+        getSupportFragmentManager()
+                .beginTransaction()
+                .replace(fragmentContainerView, fragment)
+                .addToBackStack(null)
+                .commit();
     }
 
     private void initDrawer(Toolbar toolbar) {
@@ -101,9 +95,17 @@ public class MainActivity extends AppCompatActivity implements INavigator {
     }
 
     private boolean canGoBack() {
-        return getSupportFragmentManager().getBackStackEntryCount() != 0;
+        return getSupportFragmentManager().getBackStackEntryCount() > 1;
     }
 
+    @Override
+    public void onBackPressed() {
+        if (!canGoBack()) {
+            finish();
+        } else {
+            super.onBackPressed();
+        }
+    }
 
     private Toolbar initToolbar() {
         Toolbar toolbar = findViewById(R.id.toolbar);
