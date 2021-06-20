@@ -52,6 +52,7 @@ public class MainActivity extends AppCompatActivity implements INavigator {
     @Override
     public void showNoteDetails(@NonNull NoteDataClass note) {
         if (isPortrait()) {
+            getSupportFragmentManager().beginTransaction().addToBackStack(null).commit();
             showFragment(NoteTextFragment.newInstance(note), R.id.fragmentContainerView);
         } else {
             showFragment(NoteTextFragment.newInstance(note), R.id.fragmentContainerView3);
@@ -62,7 +63,6 @@ public class MainActivity extends AppCompatActivity implements INavigator {
         getSupportFragmentManager()
                 .beginTransaction()
                 .replace(fragmentContainerView, fragment)
-                .addToBackStack("name")
                 .commit();
     }
 
@@ -74,16 +74,28 @@ public class MainActivity extends AppCompatActivity implements INavigator {
                 R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
         toggle.syncState();
-
         NavigationView navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(item -> {
             int id = item.getItemId();
-            if (navigateFragment(id)){
+            if (navigateFragment(id)) {
                 drawer.closeDrawer(GravityCompat.START);
                 return true;
             }
             return false;
         });
+        getSupportFragmentManager().addOnBackStackChangedListener(() -> toggle.setDrawerIndicatorEnabled(!canGoBack()));
+        toggle.setToolbarNavigationClickListener(v -> {
+                    if (canGoBack()) {
+                        getSupportFragmentManager().popBackStack();
+                    } else {
+                        drawer.openDrawer(GravityCompat.START);
+                    }
+                }
+        );
+    }
+
+    private boolean canGoBack() {
+        return getSupportFragmentManager().getBackStackEntryCount() != 0;
     }
 
 
