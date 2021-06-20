@@ -1,14 +1,12 @@
 package com.example.notesapp;
 
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.fragment.app.Fragment;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+
+import androidx.annotation.NonNull;
 
 public class NoteTextFragment extends BaseFragment {
 
@@ -22,16 +20,6 @@ public class NoteTextFragment extends BaseFragment {
         args.putParcelable(ARG_INDEX, noteDataClass);
         n.setArguments(args);
         return n;
-    }
-
-
-    public NoteTextFragment() {
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
     }
 
     @Override
