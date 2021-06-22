@@ -14,6 +14,7 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 
 import com.example.notesapp.data.NoteDataClass;
 import com.example.notesapp.data.NoteSourceImpl;
@@ -33,12 +34,11 @@ public class MainActivity extends AppCompatActivity implements INavigator {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        clearBackStack();
         initData();
         setContentView(R.layout.activity_main);
         Toolbar toolbar = initToolbar();
         initDrawer(toolbar);
-
-//        NoteDataClass noteOne = new NoteDataClass("note1", "someNoteDescription1", "date", "there might be your text");
 
         showNotes(noteSource);
 
@@ -95,7 +95,7 @@ public class MainActivity extends AppCompatActivity implements INavigator {
             }
             return false;
         });
-        getSupportFragmentManager().addOnBackStackChangedListener(() -> toggle.setDrawerIndicatorEnabled(!canGoBack()));
+        getSupportFragmentManager().addOnBackStackChangedListener(() -> toggle.setDrawerIndicatorEnabled(!canGoBack() || !isPortrait()));
         toggle.setToolbarNavigationClickListener(v -> {
                     if (canGoBack()) {
                         getSupportFragmentManager().popBackStack();
@@ -112,7 +112,7 @@ public class MainActivity extends AppCompatActivity implements INavigator {
 
     @Override
     public void onBackPressed() {
-        if (!canGoBack()) {
+        if (!canGoBack() && isPortrait()) {
             finish();
         } else {
             super.onBackPressed();
@@ -180,6 +180,14 @@ public class MainActivity extends AppCompatActivity implements INavigator {
             }
         };
         noteSource = new NoteSourceImpl(noteData);
+    }
+
+    private void clearBackStack() {
+        FragmentManager manager = getSupportFragmentManager();
+        if (manager.getBackStackEntryCount() > 0) {
+            FragmentManager.BackStackEntry first = manager.getBackStackEntryAt(0);
+            manager.popBackStack(first.getId(), FragmentManager.POP_BACK_STACK_INCLUSIVE);
+        }
     }
 
 }

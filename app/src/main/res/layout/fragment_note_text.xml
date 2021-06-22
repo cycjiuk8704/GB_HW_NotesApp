@@ -12,7 +12,7 @@
         android:orientation="horizontal">
 
         <EditText
-            android:id="@+id/noteName"
+            android:id="@+id/noteDetailName"
             style="@style/noteCapeStyle"
             android:layout_weight="1"
             android:layout_width="wrap_content"
@@ -21,13 +21,24 @@
             android:text="" />
 
         <EditText
-            android:id="@+id/noteDate"
+            android:id="@+id/noteDetailDate"
             style="@style/noteCapeStyle"
             android:layout_weight="1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="?attr/actionBarSize"
             android:text="" />
+
+        <Button
+            android:id="@+id/button2"
+            style="@style/noteCapeStyle"
+            android:textAllCaps="false"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginTop="?attr/actionBarSize"
+            android:text="@string/set_date" />
+
     </LinearLayout>
 
     <EditText
@@ -41,7 +52,15 @@
         android:id="@+id/noteText"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_weight="1"
         android:text=""
         android:textSize="@dimen/text_field_text_size" />
+
+    <Button
+        android:id="@+id/buttonSaveDetail"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="3"
+        android:text="@string/save_changes" />
 
 </LinearLayout>

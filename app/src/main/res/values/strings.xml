@@ -13,4 +13,6 @@
     <string name="drawer_username">UserName</string>
     <string name="about">About</string>
     <string name="back">back</string>
+    <string name="save_changes">Save changes</string>
+    <string name="set_date">Set date</string>
 </resources>

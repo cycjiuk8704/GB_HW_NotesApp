@@ -33,12 +33,14 @@ public class NoteTextFragment extends BaseFragment {
         }
 
         View v = inflater.inflate(R.layout.fragment_note_text, null);
-        TextView nameTV = v.findViewById(R.id.noteName);
+        TextView nameTV = v.findViewById(R.id.noteDetailName);
         TextView textTV = v.findViewById(R.id.noteText);
         TextView descriptionTV = v.findViewById(R.id.noteDetailDescription);
+        TextView dateTV = v.findViewById(R.id.noteDetailDate);
         nameTV.setText(noteDataClass.getName());
         textTV.setText(noteDataClass.getNoteText());
         descriptionTV.setText(noteDataClass.getDescription());
+        dateTV.setText(noteDataClass.getDateOfCreation());
 
         return v;
     }
