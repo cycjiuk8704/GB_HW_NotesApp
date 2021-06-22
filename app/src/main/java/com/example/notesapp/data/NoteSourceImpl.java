@@ -13,6 +13,22 @@ public class NoteSourceImpl implements NoteSource, Parcelable {
         this.noteSource = noteSource;
     }
 
+    protected NoteSourceImpl(Parcel in) {
+        noteSource = in.createTypedArrayList(NoteDataClass.CREATOR);
+    }
+
+    public static final Creator<NoteSourceImpl> CREATOR = new Creator<NoteSourceImpl>() {
+        @Override
+        public NoteSourceImpl createFromParcel(Parcel in) {
+            return new NoteSourceImpl(in);
+        }
+
+        @Override
+        public NoteSourceImpl[] newArray(int size) {
+            return new NoteSourceImpl[size];
+        }
+    };
+
     @Override
     public NoteDataClass getNoteData(int position) {
         return noteSource.get(position);
@@ -31,5 +47,9 @@ public class NoteSourceImpl implements NoteSource, Parcelable {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeList(noteSource);
+    }
+
+    public List<NoteDataClass> getNoteSource() {
+        return noteSource;
     }
 }

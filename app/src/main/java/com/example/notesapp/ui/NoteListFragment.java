@@ -1,6 +1,5 @@
 package com.example.notesapp.ui;
 
-import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.view.LayoutInflater;
@@ -40,11 +39,12 @@ public class NoteListFragment extends BaseFragment {
                              Bundle savedInstanceState) {
 
         if (getArguments() != null) {
-            noteData = getArguments().getParcelable(ARG_INDEX);
+            noteSource = getArguments().getParcelable(ARG_INDEX);
+            noteData = noteSource.getNoteSource();
         }
-
+        noteSource = new NoteSourceImpl(noteData);
         View v = inflater.inflate(R.layout.fragment_note_list, null);
-        initPopupMenu(v, listPosition);
+//        initPopupMenu(v, listPosition);
         RecyclerView recyclerView = v.findViewById(R.id.recycler_view_lines);
         initRecyclerView(recyclerView, noteSource);
 //        TextView nameTV = v.findViewById(R.id.noteName);
@@ -58,15 +58,15 @@ public class NoteListFragment extends BaseFragment {
         return v;
     }
 
-    @SuppressLint("ClickableViewAccessibility")
-    private void initPopupMenu(View view, int position) {
-        View noteContainer = view.findViewById(R.id.noteEntryContainer);
-        noteContainer.setOnClickListener(v -> requireNavigator().showNoteDetails(noteSource.getNoteData(listPosition)));
-        noteContainer.setOnLongClickListener(v -> {
-            initPopUpMenu(v, position);
-            return true;
-        });
-    }
+//    @SuppressLint("ClickableViewAccessibility")
+//    private void initPopupMenu(View view, int position) {
+//        View noteContainer = view.findViewById(R.id.noteEntryContainer);
+//        noteContainer.setOnClickListener(v -> requireNavigator().showNoteDetails(noteSource.getNoteData(listPosition)));
+//        noteContainer.setOnLongClickListener(v -> {
+//            initPopUpMenu(v, position);
+//            return true;
+//        });
+//    }
 
     private void initPopUpMenu(View v, int position) {
         PopupMenu popupMenu = new PopupMenu(requireContext(), v);
@@ -106,12 +106,6 @@ public class NoteListFragment extends BaseFragment {
             @Override
             public void onLongItemClick(View view, int position) {
                 initPopUpMenu(view, position);
-            }
-
-            @Override
-            public void onItemClick(View view, int position) {
-                listPosition = position;
-                requireNavigator().showNoteDetails(noteSource.getNoteData(position));
             }
         });
 
