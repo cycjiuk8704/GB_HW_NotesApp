@@ -6,20 +6,42 @@
     android:orientation="vertical"
     tools:context=".ui.NoteTextFragment">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
-        android:layout_marginTop="?attr/actionBarSize"
-        style="@style/noteCapeStyle"
-        android:id="@+id/noteName"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="" />
+        android:orientation="horizontal">
 
-    <TextView
+        <EditText
+            android:id="@+id/noteName"
+            style="@style/noteCapeStyle"
+            android:layout_weight="1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="?attr/actionBarSize"
+            android:text="" />
+
+        <EditText
+            android:id="@+id/noteDate"
+            style="@style/noteCapeStyle"
+            android:layout_weight="1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="?attr/actionBarSize"
+            android:text="" />
+    </LinearLayout>
+
+    <EditText
+        android:id="@+id/noteDetailDescription"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text=""
+        android:textSize="@dimen/text_field_text_size" />
+
+    <EditText
         android:id="@+id/noteText"
-        android:textSize="@dimen/text_field_text_size"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:text="" />
+        android:text=""
+        android:textSize="@dimen/text_field_text_size" />
 
 </LinearLayout>
