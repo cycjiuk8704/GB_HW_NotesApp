@@ -15,6 +15,11 @@ import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 
+import com.example.notesapp.data.NoteDataClass;
+import com.example.notesapp.data.NoteSourceImpl;
+import com.example.notesapp.ui.INavigator;
+import com.example.notesapp.ui.NoteListFragment;
+import com.example.notesapp.ui.NoteTextFragment;
 import com.google.android.material.navigation.NavigationView;
 
 import java.util.ArrayList;
@@ -22,25 +27,29 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements INavigator {
 
+    private NoteSourceImpl noteSource;
+    private List<NoteDataClass> noteData;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        initData();
         setContentView(R.layout.activity_main);
         Toolbar toolbar = initToolbar();
         initDrawer(toolbar);
 
-        NoteDataClass noteOne = new NoteDataClass("note1", "someNoteDescription1", "date", "there might be your text");
+//        NoteDataClass noteOne = new NoteDataClass("note1", "someNoteDescription1", "date", "there might be your text");
 
-        showNotes(noteOne);
+        showNotes(noteSource);
 
         if (!isPortrait()) {
-            showNoteDetails(noteOne);
+            showNoteDetails(noteSource.getNoteData(0));
         }
 
     }
 
     @Override
-    public void showNotes(@NonNull NoteDataClass note) {
+    public void showNotes(@NonNull NoteSourceImpl note) {
         if (isPortrait()) {
             showFragment(NoteListFragment.newInstance(note), R.id.fragmentContainerView);
         } else {
@@ -155,8 +164,8 @@ public class MainActivity extends AppCompatActivity implements INavigator {
         return true;
     }
 
-    private List<NoteDataClass> initNotesList() {
-        return new ArrayList<NoteDataClass>() {
+    private void initData() {
+        noteData = new ArrayList<NoteDataClass>() {
             {
                 add(new NoteDataClass("note1", "description1", "date1", "some text 1"));
                 add(new NoteDataClass("note2", "description2", "date2", "some text 2"));
@@ -170,6 +179,7 @@ public class MainActivity extends AppCompatActivity implements INavigator {
                 add(new NoteDataClass("note10", "description10", "date10", "some text 10"));
             }
         };
+        noteSource = new NoteSourceImpl(noteData);
     }
 
 }

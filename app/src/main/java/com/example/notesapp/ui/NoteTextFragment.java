@@ -1,4 +1,4 @@
-package com.example.notesapp;
+package com.example.notesapp.ui;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -7,6 +7,9 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+
+import com.example.notesapp.R;
+import com.example.notesapp.data.NoteDataClass;
 
 public class NoteTextFragment extends BaseFragment {
 

@@ -1,4 +1,4 @@
-package com.example.notesapp;
+package com.example.notesapp.data;
 
 import android.os.Parcel;
 import android.os.Parcelable;
