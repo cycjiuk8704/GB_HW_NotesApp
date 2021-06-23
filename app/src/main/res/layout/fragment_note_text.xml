@@ -8,6 +8,7 @@
 
     <!-- TODO: Update blank fragment layout -->
     <TextView
+        android:layout_marginTop="?attr/actionBarSize"
         style="@style/noteCapeStyle"
         android:id="@+id/noteName"
         android:layout_width="match_parent"
@@ -16,7 +17,7 @@
 
     <TextView
         android:id="@+id/noteText"
-        android:textSize="@dimen/textFieldTextSize"
+        android:textSize="@dimen/text_field_text_size"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:text="" />

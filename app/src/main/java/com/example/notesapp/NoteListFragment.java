@@ -1,14 +1,15 @@
 package com.example.notesapp;
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.widget.PopupMenu;
 
 public class NoteListFragment extends BaseFragment {
 
@@ -25,31 +26,53 @@ public class NoteListFragment extends BaseFragment {
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-    }
-
-
-    @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
         if (getArguments() != null) {
-            noteData = (NoteDataClass) getArguments().getParcelable(ARG_INDEX);
+            noteData = getArguments().getParcelable(ARG_INDEX);
         }
 
         View v = inflater.inflate(R.layout.fragment_note_list, null);
-        TextView nameTV = (TextView) v.findViewById(R.id.noteName);
-        TextView descriptionTV = (TextView) v.findViewById(R.id.noteDescription);
-        TextView dateTV = (TextView) v.findViewById(R.id.noteDate);
+        initPopupMenu(v);
+        TextView nameTV = v.findViewById(R.id.noteName);
+        TextView descriptionTV = v.findViewById(R.id.noteDescription);
+        TextView dateTV = v.findViewById(R.id.noteDate);
         nameTV.setText(noteData.getName());
         descriptionTV.setText(noteData.getDescription());
         dateTV.setText(noteData.getDateOfCreation());
 
-        LinearLayout linearLayout1 = (LinearLayout) v.findViewById(R.id.noteField);
-        linearLayout1.setOnClickListener(view -> requireNavigator().showNoteDetails(noteData));
 
         return v;
+    }
+
+    @SuppressLint("ClickableViewAccessibility")
+    private void initPopupMenu(View view) {
+        View noteContainer = view.findViewById(R.id.noteEntryContainer);
+        noteContainer.setOnClickListener(v -> requireNavigator().showNoteDetails(noteData));
+        noteContainer.setOnLongClickListener(v -> {
+            initPopUpMenu(v);
+            return true;
+        });
+    }
+
+    private void initPopUpMenu(View v) {
+        PopupMenu popupMenu = new PopupMenu(requireContext(), v);
+        popupMenu.inflate(R.menu.popup_menu);
+        popupMenu.setOnMenuItemClickListener(item -> {
+            int id = item.getItemId();
+            if (id == R.id.add_popup) {
+                Toast.makeText(getContext(), "Add new note", Toast.LENGTH_SHORT).show();
+            }
+            if (id == R.id.delete_popup) {
+                Toast.makeText(getContext(), "Delete note", Toast.LENGTH_SHORT).show();
+            }
+
+            if (id == R.id.open_popup) {
+                requireNavigator().showNoteDetails(noteData);
+            }
+            return true;
+        });
+        popupMenu.show();
     }
 }
