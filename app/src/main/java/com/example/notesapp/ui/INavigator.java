@@ -11,4 +11,6 @@ public interface INavigator {
 
     void showNoteDetails(@NonNull NoteDataClass note);
 
+    void showEditNoteDetails(@NonNull NoteDataClass note);
+
 }

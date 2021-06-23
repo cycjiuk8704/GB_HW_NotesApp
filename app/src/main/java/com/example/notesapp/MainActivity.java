@@ -18,6 +18,7 @@ import androidx.fragment.app.FragmentManager;
 
 import com.example.notesapp.data.NoteDataClass;
 import com.example.notesapp.data.NoteSourceImpl;
+import com.example.notesapp.ui.EditNoteFragment;
 import com.example.notesapp.ui.INavigator;
 import com.example.notesapp.ui.NoteListFragment;
 import com.example.notesapp.ui.NoteTextFragment;
@@ -67,6 +68,15 @@ public class MainActivity extends AppCompatActivity implements INavigator {
             showFragment(NoteTextFragment.newInstance(note), R.id.fragmentContainerView);
         } else {
             showFragment(NoteTextFragment.newInstance(note), R.id.fragmentContainerView3);
+        }
+    }
+
+    @Override
+    public void showEditNoteDetails(@NonNull NoteDataClass note) {
+        if (isPortrait()) {
+            showFragment(EditNoteFragment.newInstance(note), R.id.fragmentContainerView);
+        } else {
+            showFragment(EditNoteFragment.newInstance(note), R.id.fragmentContainerView3);
         }
     }
 

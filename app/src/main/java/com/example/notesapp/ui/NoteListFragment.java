@@ -21,14 +21,14 @@ import java.util.List;
 
 public class NoteListFragment extends BaseFragment {
 
-    private static final String ARG_INDEX = "index";
+    private static final String LIST_STATE = "state";
     private List<NoteDataClass> noteData;
     private NoteSourceImpl noteSource;
 
     public static NoteListFragment newInstance(NoteSourceImpl noteData) {
         NoteListFragment n = new NoteListFragment();
         Bundle args = new Bundle();
-        args.putParcelable(ARG_INDEX, (Parcelable) noteData);
+        args.putParcelable(LIST_STATE, (Parcelable) noteData);
         n.setArguments(args);
         return n;
     }
@@ -38,7 +38,7 @@ public class NoteListFragment extends BaseFragment {
                              Bundle savedInstanceState) {
 
         if (getArguments() != null) {
-            noteSource = getArguments().getParcelable(ARG_INDEX);
+            noteSource = getArguments().getParcelable(LIST_STATE);
             noteData = noteSource.getNoteSource();
         }
         noteSource = new NoteSourceImpl(noteData);
@@ -62,6 +62,10 @@ public class NoteListFragment extends BaseFragment {
 
             if (id == R.id.open_popup) {
                 requireNavigator().showNoteDetails(noteSource.getNoteData(position));
+            }
+
+            if (id == R.id.edit_popup) {
+                requireNavigator().showEditNoteDetails(noteSource.getNoteData(position));
             }
             return true;
         });

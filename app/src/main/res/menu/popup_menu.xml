@@ -3,13 +3,17 @@
     <item
         android:title="@string/add"
         android:id="@+id/add_popup"
-        android:orderInCategory="10"/>
+        android:orderInCategory="10" />
+    <item
+        android:title="@string/edit"
+        android:id="@+id/edit_popup"
+        android:orderInCategory="15" />
     <item
         android:title="@string/delete"
         android:id="@+id/delete_popup"
-        android:orderInCategory="20"/>
+        android:orderInCategory="20" />
     <item
         android:title="@string/open"
         android:id="@+id/open_popup"
-        android:orderInCategory="20"/>
+        android:orderInCategory="20" />
 </menu>
