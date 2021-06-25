@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.widget.Toolbar;
 
 import com.example.notesapp.R;
 import com.example.notesapp.data.NoteDataClass;
@@ -31,7 +32,7 @@ public class EditNoteFragment extends BaseFragment {
         if (getArguments() != null) {
             noteDataClass = getArguments().getParcelable(NOTE_STATE);
         }
-
+        initToolbar();
         View v = inflater.inflate(R.layout.fragment_edit_note, null);
         TextView nameTV = v.findViewById(R.id.noteEditName);
         TextView textTV = v.findViewById(R.id.noteEditText);
@@ -43,5 +44,11 @@ public class EditNoteFragment extends BaseFragment {
         dateTV.setText(noteDataClass.getDateOfCreation());
 
         return v;
+    }
+
+    @Override
+    protected void setupToolbar(Toolbar toolbar) {
+        fragmentToolbar.inflateMenu(R.menu.main_edit_frag);
+
     }
 }

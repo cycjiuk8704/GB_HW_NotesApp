@@ -3,12 +3,15 @@ package com.example.notesapp.ui;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.widget.PopupMenu;
+import androidx.appcompat.widget.SearchView;
+import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -41,6 +44,7 @@ public class NoteListFragment extends BaseFragment {
             noteSource = getArguments().getParcelable(LIST_STATE);
             noteData = noteSource.getNoteSource();
         }
+        initToolbar();
         noteSource = new NoteSourceImpl(noteData);
         View v = inflater.inflate(R.layout.fragment_note_list, null);
         RecyclerView recyclerView = v.findViewById(R.id.recycler_view_lines);
@@ -94,6 +98,38 @@ public class NoteListFragment extends BaseFragment {
             public void onItemClick(View view, int position) {
                 requireNavigator().showNoteDetails(noteSource.getNoteData(position));
             }
+        });
+    }
+
+    @Override
+    protected void setupToolbar(Toolbar toolbar) {
+        fragmentToolbar.inflateMenu(R.menu.main);
+        final MenuItem search = fragmentToolbar.getMenu().findItem(R.id.action_search);
+        SearchView searchText = (SearchView) search.getActionView();
+
+        searchText.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                Toast.makeText(getContext(), query, Toast.LENGTH_SHORT).show();
+                return true;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                return true;
+            }
+        });
+
+        toolbar.setOnMenuItemClickListener(item -> {
+            int id = item.getItemId();
+            if (id == R.id.action_settings) {
+                Toast.makeText(getContext(), id + "there might be settings fragment", Toast.LENGTH_SHORT).show();
+            }
+            if (id == R.id.action_add) {
+                Toast.makeText(getContext(), id + "there might be adding note fragment", Toast.LENGTH_SHORT).show();
+            }
+
+            return true;
         });
     }
 }

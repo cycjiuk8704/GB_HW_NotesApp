@@ -5,8 +5,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.widget.Toolbar;
 
 import com.example.notesapp.R;
 import com.example.notesapp.data.NoteDataClass;
@@ -28,10 +30,11 @@ public class NoteTextFragment extends BaseFragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
         if (getArguments() != null) {
             noteDataClass = getArguments().getParcelable(NOTE_STATE);
         }
-
+        initToolbar();
         View v = inflater.inflate(R.layout.fragment_note_text, null);
         TextView nameTV = v.findViewById(R.id.noteDetailName);
         TextView textTV = v.findViewById(R.id.noteText);
@@ -43,5 +46,21 @@ public class NoteTextFragment extends BaseFragment {
         dateTV.setText(noteDataClass.getDateOfCreation());
 
         return v;
+    }
+
+    @Override
+    protected void setupToolbar(Toolbar toolbar) {
+        fragmentToolbar.inflateMenu(R.menu.main_text_frag);
+        toolbar.setOnMenuItemClickListener(item -> {
+            int id = item.getItemId();
+            if (id == R.id.action_settings) {
+                Toast.makeText(getContext(), id + "there might be settings fragment", Toast.LENGTH_SHORT).show();
+            }
+
+            if (id == R.id.action_edit) {
+                Toast.makeText(getContext(), id + "there might be edit fragment", Toast.LENGTH_SHORT).show();
+            }
+            return true;
+        });
     }
 }

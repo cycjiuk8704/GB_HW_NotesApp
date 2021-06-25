@@ -20,6 +20,7 @@ import com.example.notesapp.data.NoteDataClass;
 import com.example.notesapp.data.NoteSourceImpl;
 import com.example.notesapp.ui.EditNoteFragment;
 import com.example.notesapp.ui.INavigator;
+import com.example.notesapp.ui.IToolbarHolder;
 import com.example.notesapp.ui.NoteListFragment;
 import com.example.notesapp.ui.NoteTextFragment;
 import com.google.android.material.navigation.NavigationView;
@@ -27,10 +28,11 @@ import com.google.android.material.navigation.NavigationView;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity implements INavigator {
+public class MainActivity extends AppCompatActivity implements INavigator, IToolbarHolder {
 
     private NoteSourceImpl noteSource;
     private List<NoteDataClass> noteData;
+    private Toolbar toolbar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,7 +40,8 @@ public class MainActivity extends AppCompatActivity implements INavigator {
         clearBackStack();
         initData();
         setContentView(R.layout.activity_main);
-        Toolbar toolbar = initToolbar();
+        toolbar = findViewById(R.id.toolbar);
+        initToolbar();
         initDrawer(toolbar);
 
         showNotes(noteSource);
@@ -77,6 +80,16 @@ public class MainActivity extends AppCompatActivity implements INavigator {
             showFragment(EditNoteFragment.newInstance(note), R.id.fragmentContainerView);
         } else {
             showFragment(EditNoteFragment.newInstance(note), R.id.fragmentContainerView3);
+        }
+    }
+
+    @Override
+    public void showAddNote() {
+        NoteDataClass emptyNote = new NoteDataClass("", "", "", "");
+        if (isPortrait()) {
+            showFragment(EditNoteFragment.newInstance(emptyNote), R.id.fragmentContainerView);
+        } else {
+            showFragment(EditNoteFragment.newInstance(emptyNote), R.id.fragmentContainerView3);
         }
     }
 
@@ -129,8 +142,7 @@ public class MainActivity extends AppCompatActivity implements INavigator {
         }
     }
 
-    private Toolbar initToolbar() {
-        Toolbar toolbar = findViewById(R.id.toolbar);
+    public void initToolbar() {
         toolbar.inflateMenu(R.menu.main);
 
         final MenuItem search = toolbar.getMenu().findItem(R.id.action_search);
@@ -154,8 +166,6 @@ public class MainActivity extends AppCompatActivity implements INavigator {
 
             return navigateFragment(id);
         });
-
-        return toolbar;
     }
 
     @SuppressLint("NonConstantResourceId")
@@ -200,4 +210,8 @@ public class MainActivity extends AppCompatActivity implements INavigator {
         }
     }
 
+    @Override
+    public Toolbar requireToolbar() {
+        return toolbar;
+    }
 }
