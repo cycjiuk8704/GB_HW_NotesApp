@@ -38,17 +38,18 @@ public class NoteListFragment extends BaseFragment {
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+                             Bundle savedInstanceState, Toolbar toolbar) {
 
         if (getArguments() != null) {
             noteSource = getArguments().getParcelable(LIST_STATE);
             noteData = noteSource.getNoteSource();
         }
-        initToolbar();
+
         noteSource = new NoteSourceImpl(noteData);
         View v = inflater.inflate(R.layout.fragment_note_list, null);
         RecyclerView recyclerView = v.findViewById(R.id.recycler_view_lines);
         initRecyclerView(recyclerView, noteSource);
+        setupToolbar(toolbar);
         return v;
     }
 
@@ -101,10 +102,9 @@ public class NoteListFragment extends BaseFragment {
         });
     }
 
-    @Override
     protected void setupToolbar(Toolbar toolbar) {
-        fragmentToolbar.inflateMenu(R.menu.main);
-        final MenuItem search = fragmentToolbar.getMenu().findItem(R.id.action_search);
+        toolbar.inflateMenu(R.menu.main);
+        final MenuItem search = toolbar.getMenu().findItem(R.id.action_search);
         SearchView searchText = (SearchView) search.getActionView();
 
         searchText.setOnQueryTextListener(new SearchView.OnQueryTextListener() {

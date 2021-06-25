@@ -29,12 +29,12 @@ public class NoteTextFragment extends BaseFragment {
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+                             Bundle savedInstanceState, Toolbar toolbar) {
 
         if (getArguments() != null) {
             noteDataClass = getArguments().getParcelable(NOTE_STATE);
         }
-        initToolbar();
+
         View v = inflater.inflate(R.layout.fragment_note_text, null);
         TextView nameTV = v.findViewById(R.id.noteDetailName);
         TextView textTV = v.findViewById(R.id.noteText);
@@ -44,13 +44,12 @@ public class NoteTextFragment extends BaseFragment {
         textTV.setText(noteDataClass.getNoteText());
         descriptionTV.setText(noteDataClass.getDescription());
         dateTV.setText(noteDataClass.getDateOfCreation());
-
+        setupToolbar(toolbar);
         return v;
     }
 
-    @Override
     protected void setupToolbar(Toolbar toolbar) {
-        fragmentToolbar.inflateMenu(R.menu.main_text_frag);
+        toolbar.inflateMenu(R.menu.main_text_frag);
         toolbar.setOnMenuItemClickListener(item -> {
             int id = item.getItemId();
             if (id == R.id.action_settings) {

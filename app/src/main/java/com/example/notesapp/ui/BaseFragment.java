@@ -1,14 +1,38 @@
 package com.example.notesapp.ui;
 
-import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 
 abstract public class BaseFragment extends Fragment {
     Toolbar fragmentToolbar;
+
+    abstract public View onCreateView(
+            @NonNull LayoutInflater inflater,
+            @Nullable ViewGroup container,
+            @Nullable Bundle savedInstanceState,
+            @NonNull Toolbar toolbar
+    );
+
+    @Nullable
+    @Override
+    final public View onCreateView(
+            @NonNull LayoutInflater inflater,
+            @Nullable ViewGroup container,
+            @Nullable Bundle savedInstanceState
+    ) {
+        Toolbar toolbar = requireIToolbarHolder().requireToolbar();
+        toolbar.getMenu().clear();
+
+        return onCreateView(inflater, container, savedInstanceState, toolbar);
+    }
 
     @NonNull
     protected INavigator requireNavigator() {
@@ -22,7 +46,7 @@ abstract public class BaseFragment extends Fragment {
     }
 
     @NonNull
-    protected IToolbarHolder requireIToolbarHolder() {
+    private IToolbarHolder requireIToolbarHolder() {
         final Activity activity = requireActivity();
 
         if (!(activity instanceof IToolbarHolder)) {
@@ -31,15 +55,5 @@ abstract public class BaseFragment extends Fragment {
 
         return (IToolbarHolder) activity;
     }
-
-    @SuppressLint("RestrictedApi")
-    @NonNull
-    protected void initToolbar() {
-        fragmentToolbar = requireIToolbarHolder().requireToolbar();
-        fragmentToolbar.getMenu().clear();
-        setupToolbar(fragmentToolbar);
-    }
-
-    abstract protected void setupToolbar(Toolbar toolbar);
 
 }
