@@ -140,6 +140,12 @@ public class MainActivity extends AppCompatActivity implements INavigator, ITool
     @Override
     public void onBackPressed() {
         if (!canGoBack() && isPortrait()) {
+            List<Fragment> fragments = getSupportFragmentManager().getFragments();
+            for (Fragment fragment : fragments) {
+                if (fragment != null && fragment.isVisible() && fragment instanceof EditNoteFragment) {
+                    ((EditNoteFragment) fragment).onBackPress();
+                }
+            }
             finish();
         } else {
             super.onBackPressed();
