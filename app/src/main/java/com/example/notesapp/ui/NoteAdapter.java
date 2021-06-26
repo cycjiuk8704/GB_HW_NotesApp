@@ -17,6 +17,7 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.ViewHolder> {
     private OnItemClickListener itemClickListener;
     private OnLongItemClickListener longItemClickListener;
 
+    private int menuPosition;
     private NoteSource noteSource;
 
     public NoteAdapter(NoteSource noteSource) {
@@ -74,6 +75,7 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.ViewHolder> {
                 public boolean onLongClick(View v) {
                     if (longItemClickListener != null) {
                         longItemClickListener.onLongItemClick(v, getAdapterPosition());
+                        menuPosition = getAdapterPosition();
                     }
                     return false;
                 }
@@ -84,6 +86,7 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.ViewHolder> {
                 public void onClick(View v) {
                     if (itemClickListener != null) {
                         itemClickListener.onItemClick(v, getAdapterPosition());
+                        menuPosition = getAdapterPosition();
                     }
 
                 }
@@ -94,6 +97,10 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.ViewHolder> {
             name.setText(noteData.getName());
             description.setText(noteData.getDescription());
             date.setText(noteData.getDateOfCreation());
+        }
+
+        public int getMenuPosition() {
+            return menuPosition;
         }
 
     }

@@ -12,7 +12,6 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 
 abstract public class BaseFragment extends Fragment {
-    Toolbar fragmentToolbar;
 
     abstract public View onCreateView(
             @NonNull LayoutInflater inflater,

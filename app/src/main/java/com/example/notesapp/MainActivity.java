@@ -16,6 +16,7 @@ import androidx.fragment.app.FragmentManager;
 
 import com.example.notesapp.data.NoteDataClass;
 import com.example.notesapp.data.NoteSourceImpl;
+import com.example.notesapp.observe.Publisher;
 import com.example.notesapp.ui.EditNoteFragment;
 import com.example.notesapp.ui.INavigator;
 import com.example.notesapp.ui.IToolbarHolder;
@@ -31,6 +32,11 @@ public class MainActivity extends AppCompatActivity implements INavigator, ITool
     private NoteSourceImpl noteSource;
     private List<NoteDataClass> noteData;
     private Toolbar toolbar;
+    private Publisher publisher = new Publisher();
+
+    public Publisher getPublisher() {
+        return publisher;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -145,10 +151,6 @@ public class MainActivity extends AppCompatActivity implements INavigator, ITool
         if (id == R.id.action_settings) {
             Toast.makeText(MainActivity.this, id + "there might be settings fragment", Toast.LENGTH_SHORT).show();
         }
-        if (id == R.id.action_add) {
-            Toast.makeText(MainActivity.this, id + "there might be adding note fragment", Toast.LENGTH_SHORT).show();
-        }
-
         if (id == R.id.action_about) {
             Toast.makeText(MainActivity.this, id + "there might be information about application", Toast.LENGTH_SHORT).show();
         }

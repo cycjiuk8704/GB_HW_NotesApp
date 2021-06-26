@@ -1,5 +1,6 @@
 package com.example.notesapp.ui;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.view.LayoutInflater;
@@ -15,10 +16,12 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.notesapp.MainActivity;
 import com.example.notesapp.R;
 import com.example.notesapp.data.NoteDataClass;
 import com.example.notesapp.data.NoteSource;
 import com.example.notesapp.data.NoteSourceImpl;
+import com.example.notesapp.observe.Publisher;
 
 import java.util.List;
 
@@ -27,6 +30,9 @@ public class NoteListFragment extends BaseFragment {
     private static final String LIST_STATE = "state";
     private List<NoteDataClass> noteData;
     private NoteSourceImpl noteSource;
+    private int menuPosition;
+    private NoteAdapter adapter;
+    private Publisher publisher;
 
     public static NoteListFragment newInstance(NoteSourceImpl noteData) {
         NoteListFragment n = new NoteListFragment();
@@ -37,8 +43,21 @@ public class NoteListFragment extends BaseFragment {
     }
 
     @Override
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+        MainActivity activity = (MainActivity) context;
+        publisher = activity.getPublisher();
+    }
+
+    @Override
+    public void onDetach() {
+        publisher = null;
+        super.onDetach();
+    }
+
+    @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState, Toolbar toolbar) {
+                             Bundle savedInstanceState, @NonNull Toolbar toolbar) {
 
         if (getArguments() != null) {
             noteSource = getArguments().getParcelable(LIST_STATE);
@@ -59,22 +78,26 @@ public class NoteListFragment extends BaseFragment {
         popupMenu.setOnMenuItemClickListener(item -> {
             int id = item.getItemId();
             if (id == R.id.add_popup) {
-                Toast.makeText(getContext(), "Add new note", Toast.LENGTH_SHORT).show();
-            }
-            if (id == R.id.delete_popup) {
-                Toast.makeText(getContext(), "Delete note", Toast.LENGTH_SHORT).show();
-            }
-
-            if (id == R.id.open_popup) {
+                addNewNote();
+            } else if (id == R.id.delete_popup) {
+                noteSource.deleteNoteData(position);
+                adapter.notifyItemRemoved(position);
+            } else if (id == R.id.open_popup) {
                 requireNavigator().showNoteDetails(noteSource.getNoteData(position));
-            }
-
-            if (id == R.id.edit_popup) {
+                updateNoteData();
+            } else if (id == R.id.edit_popup) {
                 requireNavigator().showEditNoteDetails(noteSource.getNoteData(position));
+                updateNoteData();
             }
             return true;
         });
         popupMenu.show();
+    }
+
+    private void addNewNote() {
+        requireNavigator().showAddNote();
+        menuPosition = noteSource.size();
+        addNoteData();
     }
 
     private void initRecyclerView(RecyclerView recyclerView, NoteSource data) {
@@ -84,13 +107,14 @@ public class NoteListFragment extends BaseFragment {
         LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(layoutManager);
 
-        final NoteAdapter adapter = new NoteAdapter(data);
+        adapter = new NoteAdapter(data);
         recyclerView.setAdapter(adapter);
 
         adapter.SetOnLongItemClickListener(new NoteAdapter.OnLongItemClickListener() {
             @Override
             public void onLongItemClick(View view, int position) {
                 initPopUpMenu(view, position);
+                menuPosition = position;
             }
         });
 
@@ -98,6 +122,8 @@ public class NoteListFragment extends BaseFragment {
             @Override
             public void onItemClick(View view, int position) {
                 requireNavigator().showNoteDetails(noteSource.getNoteData(position));
+                menuPosition = position;
+                updateNoteData();
             }
         });
     }
@@ -124,12 +150,26 @@ public class NoteListFragment extends BaseFragment {
             int id = item.getItemId();
             if (id == R.id.action_settings) {
                 Toast.makeText(getContext(), id + "there might be settings fragment", Toast.LENGTH_SHORT).show();
-            }
-            if (id == R.id.action_add) {
-                Toast.makeText(getContext(), id + "there might be adding note fragment", Toast.LENGTH_SHORT).show();
+            } else if (id == R.id.action_add) {
+                addNewNote();
             }
 
             return true;
         });
+    }
+
+    public void updateNoteData() {
+        publisher.subscribe(noteDataClass -> {
+            noteSource.updateNoteData(menuPosition, noteDataClass);
+            adapter.notifyItemChanged(menuPosition);
+        });
+    }
+
+    public void addNoteData() {
+        publisher.subscribe(noteDataClass -> {
+            noteSource.addNoteData(noteDataClass);
+            adapter.notifyItemInserted(noteSource.size() - 1);
+        });
+
     }
 }
