@@ -21,6 +21,7 @@ import com.example.notesapp.R;
 import com.example.notesapp.data.NoteDataClass;
 import com.example.notesapp.data.NoteSource;
 import com.example.notesapp.data.NoteSourceImpl;
+import com.example.notesapp.observe.Observer;
 import com.example.notesapp.observe.Publisher;
 
 import java.util.List;
@@ -33,6 +34,14 @@ public class NoteListFragment extends BaseFragment {
     private int menuPosition;
     private NoteAdapter adapter;
     private Publisher publisher;
+    private Observer observer = new Observer() {
+        @Override
+        public void updateValue(@NonNull NoteSourceImpl value) {
+            getArguments().putParcelable(LIST_STATE, value);
+            noteSource.updateNoteData(menuPosition, value.getNoteData(menuPosition));
+            adapter.notifyItemChanged(menuPosition);
+        }
+    };
 
     public static NoteListFragment newInstance(NoteSourceImpl noteData) {
         NoteListFragment n = new NoteListFragment();
@@ -83,11 +92,9 @@ public class NoteListFragment extends BaseFragment {
                 noteSource.deleteNoteData(position);
                 adapter.notifyItemRemoved(position);
             } else if (id == R.id.open_popup) {
-                requireNavigator().showNoteDetails(noteSource.getNoteData(position));
-                updateNoteData();
+                requireNavigator().showNoteDetails(noteSource, position);
             } else if (id == R.id.edit_popup) {
-                requireNavigator().showEditNoteDetails(noteSource.getNoteData(position));
-                updateNoteData();
+                requireNavigator().showEditNoteDetails(noteSource, position);
             }
             return true;
         });
@@ -97,7 +104,6 @@ public class NoteListFragment extends BaseFragment {
     private void addNewNote() {
         requireNavigator().showAddNote();
         menuPosition = noteSource.size();
-        addNoteData();
     }
 
     private void initRecyclerView(RecyclerView recyclerView, NoteSource data) {
@@ -121,9 +127,8 @@ public class NoteListFragment extends BaseFragment {
         adapter.SetOnItemClickListener(new NoteAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
-                requireNavigator().showNoteDetails(noteSource.getNoteData(position));
+                requireNavigator().showNoteDetails(noteSource, position);
                 menuPosition = position;
-                updateNoteData();
             }
         });
     }
@@ -156,20 +161,5 @@ public class NoteListFragment extends BaseFragment {
 
             return true;
         });
-    }
-
-    public void updateNoteData() {
-        publisher.subscribe(noteDataClass -> {
-            noteSource.updateNoteData(menuPosition, noteDataClass);
-            adapter.notifyItemChanged(menuPosition);
-        });
-    }
-
-    public void addNoteData() {
-        publisher.subscribe(noteDataClass -> {
-            noteSource.addNoteData(noteDataClass);
-            adapter.notifyItemInserted(noteSource.size() - 1);
-        });
-
     }
 }

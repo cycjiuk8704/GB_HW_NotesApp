@@ -22,5 +22,6 @@
     <style name="noteCapeStyle">
         <item name="android:textSize">22sp</item>
         <item name="android:textAlignment">center</item>
+        <item name="android:gravity">center</item>
     </style>
 </resources>

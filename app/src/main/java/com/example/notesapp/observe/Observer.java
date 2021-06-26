@@ -1,7 +1,11 @@
 package com.example.notesapp.observe;
 
-import com.example.notesapp.data.NoteDataClass;
+import androidx.annotation.NonNull;
 
-public interface Observer {
-    void updateData(NoteDataClass noteDataClass);
+import com.example.notesapp.data.NoteSourceImpl;
+
+public interface Observer<T> {
+
+    void updateValue(@NonNull NoteSourceImpl value);
+
 }

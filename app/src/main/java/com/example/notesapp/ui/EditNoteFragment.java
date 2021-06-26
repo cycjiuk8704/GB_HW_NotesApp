@@ -6,12 +6,10 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.text.format.DateUtils;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.DatePicker;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -21,6 +19,7 @@ import androidx.appcompat.widget.Toolbar;
 import com.example.notesapp.MainActivity;
 import com.example.notesapp.R;
 import com.example.notesapp.data.NoteDataClass;
+import com.example.notesapp.data.NoteSourceImpl;
 import com.example.notesapp.observe.Publisher;
 
 import java.util.Calendar;
@@ -28,12 +27,15 @@ import java.util.Calendar;
 public class EditNoteFragment extends BaseFragment {
 
     private static final String NOTE_STATE = "state";
+    private static final String NOTE_POSITION = "position";
     private NoteDataClass noteDataClass;
+    private NoteSourceImpl noteSource;
+    private int position;
     private TextView nameTV;
     private TextView textTV;
     private TextView descriptionTV;
     private TextView dateTV;
-    private Calendar calendar = Calendar.getInstance();
+    private final Calendar calendar = Calendar.getInstance();
     private Publisher publisher;
 
     @Override
@@ -49,29 +51,30 @@ public class EditNoteFragment extends BaseFragment {
         super.onDetach();
     }
 
-    DatePickerDialog.OnDateSetListener d = new DatePickerDialog.OnDateSetListener() {
-        public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
-            calendar.set(Calendar.YEAR, year);
-            calendar.set(Calendar.MONTH, monthOfYear);
-            calendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
-            setInitialDate();
-        }
+    DatePickerDialog.OnDateSetListener d = (view, year, monthOfYear, dayOfMonth) -> {
+        calendar.set(Calendar.YEAR, year);
+        calendar.set(Calendar.MONTH, monthOfYear);
+        calendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
+        setInitialDate();
     };
 
-    public static EditNoteFragment newInstance(NoteDataClass noteDataClass) {
-        EditNoteFragment noteTextFragment = new EditNoteFragment();
+    public static EditNoteFragment newInstance(NoteSourceImpl noteData, int position) {
+        EditNoteFragment noteEditFragment = new EditNoteFragment();
 
         Bundle args = new Bundle();
-        args.putParcelable(NOTE_STATE, noteDataClass);
-        noteTextFragment.setArguments(args);
-        return noteTextFragment;
+        args.putParcelable(NOTE_STATE, noteData);
+        args.putInt(NOTE_POSITION, position);
+        noteEditFragment.setArguments(args);
+        return noteEditFragment;
     }
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState, Toolbar toolbar) {
+                             Bundle savedInstanceState, @NonNull Toolbar toolbar) {
         if (getArguments() != null) {
-            noteDataClass = getArguments().getParcelable(NOTE_STATE);
+            noteSource = getArguments().getParcelable(NOTE_STATE);
+            position = getArguments().getInt(NOTE_POSITION);
+            noteDataClass = noteSource.getNoteData(position);
         }
         return initView(inflater, toolbar);
     }
@@ -86,15 +89,6 @@ public class EditNoteFragment extends BaseFragment {
         nameTV.setText(noteDataClass.getName());
         textTV.setText(noteDataClass.getNoteText());
         descriptionTV.setText(noteDataClass.getDescription());
-        v.setOnKeyListener(new View.OnKeyListener() {
-            @Override
-            public boolean onKey(View v, int keyCode, KeyEvent event) {
-                if (keyCode == KeyEvent.KEYCODE_BACK) {
-                    onCreateExitDialog();
-                }
-                return false;
-            }
-        });
         if (noteDataClass.getDateOfCreation().equals("")) {
             setInitialDate();
         } else {
@@ -106,7 +100,8 @@ public class EditNoteFragment extends BaseFragment {
 
         Button buttonSave = v.findViewById(R.id.buttonSaveEdit);
         buttonSave.setOnClickListener(v1 -> {
-            publisher.notifySingle(new NoteDataClass(nameTV.getText().toString(), descriptionTV.getText().toString(), dateTV.getText().toString(), textTV.getText().toString()));
+            noteSource.updateNoteData(position, new NoteDataClass(nameTV.getText().toString(), descriptionTV.getText().toString(), dateTV.getText().toString(), textTV.getText().toString()));
+            publisher.notify(noteSource);
             requireActivity().getSupportFragmentManager().popBackStack();
         });
 
@@ -135,7 +130,7 @@ public class EditNoteFragment extends BaseFragment {
 
     @NonNull
     public Dialog onCreateExitDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        AlertDialog.Builder builder = new AlertDialog.Builder(requireActivity());
         builder.setTitle("Выход из режима редактирования")
                 .setMessage("Действительно хотите выйти? Внесенные изменения не сохранятся")
                 .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
@@ -151,14 +146,4 @@ public class EditNoteFragment extends BaseFragment {
                 });
         return builder.create();
     }
-
-//    private void editNote() {
-//        if (menuPosition == noteSource.size()){
-//            noteSource.addNoteData(noteDataClass);
-//            adapter.notifyItemInserted(noteSource.size() - 1);
-//        } else {
-//            noteSource.updateNoteData(menuPosition, noteDataClass);
-//            adapter.notifyItemChanged(menuPosition);
-//        }
-//    }
 }

@@ -50,7 +50,7 @@ public class MainActivity extends AppCompatActivity implements INavigator, ITool
         showNotes(noteSource);
 
         if (!isPortrait()) {
-            showNoteDetails(noteSource.getNoteData(0));
+            showNoteDetails(noteSource, 0);
         }
 
     }
@@ -69,30 +69,31 @@ public class MainActivity extends AppCompatActivity implements INavigator, ITool
     }
 
     @Override
-    public void showNoteDetails(@NonNull NoteDataClass note) {
+    public void showNoteDetails(@NonNull NoteSourceImpl note, int position) {
         if (isPortrait()) {
-            showFragment(NoteTextFragment.newInstance(note), R.id.fragmentContainerView);
+            showFragment(NoteTextFragment.newInstance(note, position), R.id.fragmentContainerView);
         } else {
-            showFragment(NoteTextFragment.newInstance(note), R.id.fragmentContainerView3);
+            showFragment(NoteTextFragment.newInstance(note, position), R.id.fragmentContainerView3);
         }
     }
 
     @Override
-    public void showEditNoteDetails(@NonNull NoteDataClass note) {
+    public void showEditNoteDetails(@NonNull NoteSourceImpl note, int position) {
         if (isPortrait()) {
-            showFragment(EditNoteFragment.newInstance(note), R.id.fragmentContainerView);
+            showFragment(EditNoteFragment.newInstance(note, position), R.id.fragmentContainerView);
         } else {
-            showFragment(EditNoteFragment.newInstance(note), R.id.fragmentContainerView3);
+            showFragment(EditNoteFragment.newInstance(note, position), R.id.fragmentContainerView3);
         }
     }
 
     @Override
     public void showAddNote() {
         NoteDataClass emptyNote = new NoteDataClass("", "", "", "");
+        noteSource.addNoteData(emptyNote);
         if (isPortrait()) {
-            showFragment(EditNoteFragment.newInstance(emptyNote), R.id.fragmentContainerView);
+            showFragment(EditNoteFragment.newInstance(noteSource, noteSource.size() - 1), R.id.fragmentContainerView);
         } else {
-            showFragment(EditNoteFragment.newInstance(emptyNote), R.id.fragmentContainerView3);
+            showFragment(EditNoteFragment.newInstance(noteSource, noteSource.size() - 1), R.id.fragmentContainerView3);
         }
     }
 

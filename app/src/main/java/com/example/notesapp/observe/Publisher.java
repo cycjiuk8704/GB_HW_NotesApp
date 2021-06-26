@@ -1,39 +1,36 @@
 package com.example.notesapp.observe;
 
-import com.example.notesapp.data.NoteDataClass;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
+import com.example.notesapp.data.NoteSourceImpl;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
-public class Publisher {
-    private List<Observer> observers;
-    private Iterator<Observer> iterator;
+public class Publisher<T> {
 
-    public Publisher() {
-        observers = new ArrayList<>();
-        iterator = observers.listIterator();
-    }
+    private final List<Observer<T>> observers = new ArrayList<>();
+    @Nullable
+    private NoteSourceImpl value;
 
-    public void subscribe(Observer observer) {
+    public void subscribe(Observer<T> observer) {
         observers.add(observer);
+
+        if (value != null) {
+            observer.updateValue(value);
+        }
     }
 
-    public void unsubscribe(Observer observer) {
+    public void unsubscribe(Observer<T> observer) {
         observers.remove(observer);
     }
 
-    public void notifySingle(NoteDataClass noteDataClass) {
-        for (Iterator<Observer> i = observers.iterator(); i.hasNext(); ) {
-            i.next().updateData(noteDataClass);
-            i.remove();
-//        while (iterator.hasNext()){
-//            iterator.next();
-//            observers.remove(this);
-//            iterator.remove();
-//        for (Observer observer : observers) {
-//            observer.updateData(noteDataClass);
-//            unsubscribe(observer);
+    public void notify(@NonNull NoteSourceImpl value) {
+        this.value = value;
+
+        for (Observer<T> observer : observers) {
+            observer.updateValue(value);
         }
     }
 

@@ -11,24 +11,24 @@
     <TextView
         android:id="@+id/noteName"
         style="@style/noteTextStyle"
-        android:layout_width="wrap_content"
+        android:layout_width="@dimen/item_name_width"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
+
         android:text="" />
 
     <TextView
         android:id="@+id/noteDescription"
         style="@style/noteTextStyle"
-        android:layout_width="wrap_content"
+        android:layout_width="@dimen/item_description_width"
         android:layout_height="wrap_content"
-        android:layout_weight="3"
+
         android:text="" />
 
     <TextView
         android:id="@+id/noteDate"
         style="@style/noteTextStyle"
-        android:layout_width="wrap_content"
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
+
         android:text="" />
 </LinearLayout>

@@ -16,16 +16,14 @@
         <TextView
             android:id="@+id/noteDetailName"
             style="@style/noteCapeStyle"
-            android:layout_weight="1"
-            android:layout_width="wrap_content"
+            android:layout_width="@dimen/detail_name_width"
             android:layout_height="wrap_content"
             android:text="" />
 
         <TextView
             android:id="@+id/noteDetailDate"
             style="@style/noteCapeStyle"
-            android:layout_weight="1"
-            android:layout_width="wrap_content"
+            android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:text="" />
 
