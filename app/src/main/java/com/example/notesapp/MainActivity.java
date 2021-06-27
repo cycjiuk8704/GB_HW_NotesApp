@@ -90,6 +90,7 @@ public class MainActivity extends AppCompatActivity implements INavigator, ITool
     public void showAddNote() {
         NoteDataClass emptyNote = new NoteDataClass("", "", "", "");
         noteSource.addNoteData(emptyNote);
+        publisher.notify(noteSource);
         if (isPortrait()) {
             showFragment(EditNoteFragment.newInstance(noteSource, noteSource.size() - 1), R.id.fragmentContainerView);
         } else {

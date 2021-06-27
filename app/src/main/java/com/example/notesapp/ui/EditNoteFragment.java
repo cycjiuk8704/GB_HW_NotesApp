@@ -17,14 +17,13 @@ import androidx.appcompat.widget.Toolbar;
 
 import com.example.notesapp.MainActivity;
 import com.example.notesapp.R;
-import com.example.notesapp.data.IBackPressHolder;
 import com.example.notesapp.data.NoteDataClass;
 import com.example.notesapp.data.NoteSourceImpl;
 import com.example.notesapp.observe.Publisher;
 
 import java.util.Calendar;
 
-public class EditNoteFragment extends BaseFragment implements IBackPressHolder {
+public class EditNoteFragment extends BaseFragment implements IBackPressHandler {
 
     private static final String NOTE_STATE = "state";
     private static final String NOTE_POSITION = "position";
@@ -142,6 +141,7 @@ public class EditNoteFragment extends BaseFragment implements IBackPressHolder {
                             noteDataClass.getDescription().equals("") && noteDataClass.getNoteText().equals("")) {
                         NoteSourceImpl noteSourceTemp = new NoteSourceImpl(noteSource.getNoteSource());
                         noteSourceTemp.deleteNoteData(position);
+                        noteSource = noteSourceTemp;
                         publisher.notify(noteSourceTemp);
                     }
                     requireActivity().getSupportFragmentManager().popBackStack();

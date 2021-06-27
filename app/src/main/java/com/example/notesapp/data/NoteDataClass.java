@@ -4,7 +4,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 public class NoteDataClass implements Parcelable {
-    private String name;
+    private final String name;
     private final String description;
     private final String dateOfCreation;
     private final String noteText;
@@ -49,10 +49,6 @@ public class NoteDataClass implements Parcelable {
 
     public String getNoteText() {
         return noteText;
-    }
-
-    public void setName(String name) {
-        this.name = name;
     }
 
     @Override
