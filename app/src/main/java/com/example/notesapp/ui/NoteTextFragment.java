@@ -2,7 +2,6 @@ package com.example.notesapp.ui;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -30,8 +29,8 @@ public class NoteTextFragment extends BaseFragment {
     private TextView textTV;
     private TextView descriptionTV;
     private TextView dateTV;
-    private Publisher publisher;
-    private final Observer observer = value -> {
+    private Publisher<NoteSourceImpl> publisher;
+    private final Observer<NoteSourceImpl> observer = value -> {
         assert getArguments() != null;
         getArguments().putParcelable(NOTE_STATE, value);
     };
@@ -40,7 +39,7 @@ public class NoteTextFragment extends BaseFragment {
         NoteTextFragment noteTextFragment = new NoteTextFragment();
 
         Bundle args = new Bundle();
-        args.putParcelable(NOTE_STATE, (Parcelable) noteData);
+        args.putParcelable(NOTE_STATE, noteData);
         args.putInt(NOTE_POSITION, position);
         noteTextFragment.setArguments(args);
         return noteTextFragment;

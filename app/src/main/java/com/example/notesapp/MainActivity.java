@@ -32,9 +32,9 @@ public class MainActivity extends AppCompatActivity implements INavigator, ITool
     private NoteSourceImpl noteSource;
     private List<NoteDataClass> noteData;
     private Toolbar toolbar;
-    private Publisher publisher = new Publisher();
+    private final Publisher<NoteSourceImpl> publisher = new Publisher<>();
 
-    public Publisher getPublisher() {
+    public Publisher<NoteSourceImpl> getPublisher() {
         return publisher;
     }
 

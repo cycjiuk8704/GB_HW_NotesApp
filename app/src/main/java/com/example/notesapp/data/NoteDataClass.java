@@ -5,9 +5,9 @@ import android.os.Parcelable;
 
 public class NoteDataClass implements Parcelable {
     private String name;
-    private String description;
-    private String dateOfCreation;
-    private String noteText;
+    private final String description;
+    private final String dateOfCreation;
+    private final String noteText;
 
     public NoteDataClass(String name, String description, String dateOfCreation, String noteText) {
         this.name = name;

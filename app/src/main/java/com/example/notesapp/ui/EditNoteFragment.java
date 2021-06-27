@@ -36,7 +36,7 @@ public class EditNoteFragment extends BaseFragment implements IBackPressHolder {
     private TextView descriptionTV;
     private TextView dateTV;
     private final Calendar calendar = Calendar.getInstance();
-    private Publisher publisher;
+    private Publisher<NoteSourceImpl> publisher;
 
     @Override
     public void onAttach(@NonNull Context context) {

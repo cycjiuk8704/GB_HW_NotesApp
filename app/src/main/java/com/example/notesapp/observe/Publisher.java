@@ -3,8 +3,6 @@ package com.example.notesapp.observe;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.example.notesapp.data.NoteSourceImpl;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,7 +10,7 @@ public class Publisher<T> {
 
     private final List<Observer<T>> observers = new ArrayList<>();
     @Nullable
-    private NoteSourceImpl value;
+    private T value;
 
     public void subscribe(Observer<T> observer) {
         observers.add(observer);
@@ -26,7 +24,7 @@ public class Publisher<T> {
         observers.remove(observer);
     }
 
-    public void notify(@NonNull NoteSourceImpl value) {
+    public void notify(@NonNull T value) {
         this.value = value;
 
         for (Observer<T> observer : observers) {

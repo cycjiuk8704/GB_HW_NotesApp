@@ -32,10 +32,11 @@ public class NoteListFragment extends BaseFragment {
     private NoteSourceImpl noteSource;
     private int menuPosition;
     private NoteAdapter adapter;
-    private Publisher publisher;
-    private Observer observer = new Observer() {
+    private Publisher<NoteSourceImpl> publisher;
+    private final Observer<NoteSourceImpl> observer = new Observer<NoteSourceImpl>() {
         @Override
         public void updateValue(@NonNull NoteSourceImpl value) {
+            assert getArguments() != null;
             getArguments().putParcelable(LIST_STATE, value);
             noteSource.updateNoteData(menuPosition, value.getNoteData(menuPosition));
             adapter.notifyItemChanged(menuPosition);
