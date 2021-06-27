@@ -3,7 +3,6 @@ package com.example.notesapp.ui;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.os.Bundle;
 import android.text.format.DateUtils;
 import android.view.LayoutInflater;
@@ -129,42 +128,27 @@ public class EditNoteFragment extends BaseFragment implements IBackPressHolder {
                 .show();
     }
 
-    @NonNull
-    public Dialog onCreateExitDialog() {
+    @Override
+    public boolean onBackPress() {
+        quitDialog().show();
+        return true;
+    }
+
+    private Dialog quitDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(requireActivity());
-        builder.setTitle("Выход из режима редактирования")
-                .setMessage("Действительно хотите выйти? Внесенные изменения не сохранятся")
-                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        onDetach();
+        builder.setTitle(R.string.edit_note_quit_dialog_title).setMessage(R.string.edit_note_quit_dialog_msg)
+                .setPositiveButton(R.string.yes, (dialog, which) -> {
+                    if (noteDataClass.getName().equals("") && noteDataClass.getDateOfCreation().equals("") &&
+                            noteDataClass.getDescription().equals("") && noteDataClass.getNoteText().equals("")) {
+                        NoteSourceImpl noteSourceTemp = new NoteSourceImpl(noteSource.getNoteSource());
+                        noteSourceTemp.deleteNoteData(position);
+                        publisher.notify(noteSourceTemp);
                     }
+                    requireActivity().getSupportFragmentManager().popBackStack();
+                    dialog.dismiss();
                 })
-                .setNegativeButton("No", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.cancel();
-                    }
-                });
+                .setNegativeButton(R.string.no, (dialog, which) -> dialog.cancel());
         return builder.create();
     }
 
-    @Override
-    public boolean onBackPress() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(requireActivity());
-        builder.setTitle(R.string.edit_note_quit_dialog_title)
-                .setMessage(R.string.edit_note_quit_dialog_msg)
-                .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        requireActivity().getSupportFragmentManager().popBackStack();
-                    }
-                })
-                .setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.cancel();
-                    }
-                });
-        builder.create();
-        return true;
-    }
 }

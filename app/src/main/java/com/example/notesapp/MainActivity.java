@@ -65,7 +65,7 @@ public class MainActivity extends AppCompatActivity implements INavigator, ITool
     }
 
     private boolean isPortrait() {
-        return getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT;
+        return (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT);
     }
 
     @Override
@@ -123,30 +123,26 @@ public class MainActivity extends AppCompatActivity implements INavigator, ITool
             return false;
         });
         getSupportFragmentManager().addOnBackStackChangedListener(() -> toggle.setDrawerIndicatorEnabled(!canGoBack() || !isPortrait()));
-        toggle.setToolbarNavigationClickListener(v -> {
-                    if (canGoBack()) {
-                        getSupportFragmentManager().popBackStack();
-                    } else {
-                        drawer.openDrawer(GravityCompat.START);
-                    }
-                }
-        );
+        toggle.setToolbarNavigationClickListener(v -> onBackPressed());
     }
 
     private boolean canGoBack() {
-        return getSupportFragmentManager().getBackStackEntryCount() > 1;
+        return (getSupportFragmentManager().getBackStackEntryCount() > 1);
     }
 
     @Override
     public void onBackPressed() {
-        if (!canGoBack() && isPortrait()) {
-            List<Fragment> fragments = getSupportFragmentManager().getFragments();
-            for (Fragment fragment : fragments) {
-                if (fragment != null && fragment.isVisible() && fragment instanceof EditNoteFragment) {
-                    ((EditNoteFragment) fragment).onBackPress();
+        if (isPortrait()) {
+            if (canGoBack()) {
+                List<Fragment> fragments = getSupportFragmentManager().getFragments();
+                for (Fragment fragment : fragments) {
+                    if (canGoBack() && fragment != null && fragment.isVisible() && fragment instanceof EditNoteFragment) {
+                        ((EditNoteFragment) fragment).onBackPress();
+                    }
                 }
+            } else {
+                finish();
             }
-            finish();
         } else {
             super.onBackPressed();
         }
