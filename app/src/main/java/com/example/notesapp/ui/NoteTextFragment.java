@@ -74,7 +74,7 @@ public class NoteTextFragment extends BaseFragment {
             position = getArguments().getInt(NOTE_POSITION);
             noteDataClass = noteData.getNoteData(position);
         }
-
+        publisher.subscribe(observer);
         View v = inflater.inflate(R.layout.fragment_note_text, null);
         nameTV = v.findViewById(R.id.noteDetailName);
         textTV = v.findViewById(R.id.noteText);

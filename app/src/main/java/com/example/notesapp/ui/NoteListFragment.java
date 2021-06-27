@@ -2,7 +2,6 @@ package com.example.notesapp.ui;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -46,7 +45,7 @@ public class NoteListFragment extends BaseFragment {
     public static NoteListFragment newInstance(NoteSourceImpl noteData) {
         NoteListFragment n = new NoteListFragment();
         Bundle args = new Bundle();
-        args.putParcelable(LIST_STATE, (Parcelable) noteData);
+        args.putParcelable(LIST_STATE, noteData);
         n.setArguments(args);
         return n;
     }
@@ -72,7 +71,7 @@ public class NoteListFragment extends BaseFragment {
             noteSource = getArguments().getParcelable(LIST_STATE);
             noteData = noteSource.getNoteSource();
         }
-
+        publisher.subscribe(observer);
         noteSource = new NoteSourceImpl(noteData);
         View v = inflater.inflate(R.layout.fragment_note_list, null);
         RecyclerView recyclerView = v.findViewById(R.id.recycler_view_lines);
@@ -116,20 +115,14 @@ public class NoteListFragment extends BaseFragment {
         adapter = new NoteAdapter(data);
         recyclerView.setAdapter(adapter);
 
-        adapter.SetOnLongItemClickListener(new NoteAdapter.OnLongItemClickListener() {
-            @Override
-            public void onLongItemClick(View view, int position) {
-                initPopUpMenu(view, position);
-                menuPosition = position;
-            }
+        adapter.SetOnLongItemClickListener((view, position) -> {
+            initPopUpMenu(view, position);
+            menuPosition = position;
         });
 
-        adapter.SetOnItemClickListener(new NoteAdapter.OnItemClickListener() {
-            @Override
-            public void onItemClick(View view, int position) {
-                requireNavigator().showNoteDetails(noteSource, position);
-                menuPosition = position;
-            }
+        adapter.SetOnItemClickListener((view, position) -> {
+            requireNavigator().showNoteDetails(noteSource, position);
+            menuPosition = position;
         });
     }
 

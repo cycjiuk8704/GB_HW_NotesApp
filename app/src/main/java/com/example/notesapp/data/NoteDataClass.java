@@ -55,18 +55,6 @@ public class NoteDataClass implements Parcelable {
         this.name = name;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public void setDateOfCreation(String dateOfCreation) {
-        this.dateOfCreation = dateOfCreation;
-    }
-
-    public void setNoteText(String noteText) {
-        this.noteText = noteText;
-    }
-
     @Override
     public int describeContents() {
         return 0;
