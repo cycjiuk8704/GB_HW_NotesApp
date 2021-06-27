@@ -130,21 +130,24 @@ public class MainActivity extends AppCompatActivity implements INavigator, ITool
         return (getSupportFragmentManager().getBackStackEntryCount() > 1);
     }
 
+    private boolean isEditFragmentCurrent() {
+        List<Fragment> fragments = getSupportFragmentManager().getFragments();
+        for (Fragment fragment : fragments) {
+            if (canGoBack() && fragment != null && fragment.isVisible() && fragment instanceof EditNoteFragment) {
+                return ((EditNoteFragment) fragment).onBackPress();
+            }
+        }
+        return false;
+    }
+
     @Override
     public void onBackPressed() {
         if (isPortrait()) {
-            if (canGoBack()) {
-                List<Fragment> fragments = getSupportFragmentManager().getFragments();
-                for (Fragment fragment : fragments) {
-                    if (canGoBack() && fragment != null && fragment.isVisible() && fragment instanceof EditNoteFragment) {
-                        ((EditNoteFragment) fragment).onBackPress();
-                    }
-                }
-            } else {
+            if (canGoBack() && !isEditFragmentCurrent()) {
+                super.onBackPressed();
+            } else if (!canGoBack()) {
                 finish();
             }
-        } else {
-            super.onBackPressed();
         }
     }
 
