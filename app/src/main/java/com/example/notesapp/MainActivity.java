@@ -3,13 +3,11 @@ package com.example.notesapp;
 import android.annotation.SuppressLint;
 import android.content.res.Configuration;
 import android.os.Bundle;
-import android.view.MenuItem;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
@@ -18,8 +16,10 @@ import androidx.fragment.app.FragmentManager;
 
 import com.example.notesapp.data.NoteDataClass;
 import com.example.notesapp.data.NoteSourceImpl;
+import com.example.notesapp.observe.Publisher;
 import com.example.notesapp.ui.EditNoteFragment;
 import com.example.notesapp.ui.INavigator;
+import com.example.notesapp.ui.IToolbarHolder;
 import com.example.notesapp.ui.NoteListFragment;
 import com.example.notesapp.ui.NoteTextFragment;
 import com.google.android.material.navigation.NavigationView;
@@ -27,10 +27,16 @@ import com.google.android.material.navigation.NavigationView;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity implements INavigator {
+public class MainActivity extends AppCompatActivity implements INavigator, IToolbarHolder {
 
     private NoteSourceImpl noteSource;
     private List<NoteDataClass> noteData;
+    private Toolbar toolbar;
+    private final Publisher<NoteSourceImpl> publisher = new Publisher<>();
+
+    public Publisher<NoteSourceImpl> getPublisher() {
+        return publisher;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,13 +44,13 @@ public class MainActivity extends AppCompatActivity implements INavigator {
         clearBackStack();
         initData();
         setContentView(R.layout.activity_main);
-        Toolbar toolbar = initToolbar();
+        toolbar = findViewById(R.id.toolbar);
         initDrawer(toolbar);
 
         showNotes(noteSource);
 
         if (!isPortrait()) {
-            showNoteDetails(noteSource.getNoteData(0));
+            showNoteDetails(noteSource, 0);
         }
 
     }
@@ -59,24 +65,36 @@ public class MainActivity extends AppCompatActivity implements INavigator {
     }
 
     private boolean isPortrait() {
-        return getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT;
+        return (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT);
     }
 
     @Override
-    public void showNoteDetails(@NonNull NoteDataClass note) {
+    public void showNoteDetails(@NonNull NoteSourceImpl note, int position) {
         if (isPortrait()) {
-            showFragment(NoteTextFragment.newInstance(note), R.id.fragmentContainerView);
+            showFragment(NoteTextFragment.newInstance(note, position), R.id.fragmentContainerView);
         } else {
-            showFragment(NoteTextFragment.newInstance(note), R.id.fragmentContainerView3);
+            showFragment(NoteTextFragment.newInstance(note, position), R.id.fragmentContainerView3);
         }
     }
 
     @Override
-    public void showEditNoteDetails(@NonNull NoteDataClass note) {
+    public void showEditNoteDetails(@NonNull NoteSourceImpl note, int position) {
         if (isPortrait()) {
-            showFragment(EditNoteFragment.newInstance(note), R.id.fragmentContainerView);
+            showFragment(EditNoteFragment.newInstance(note, position), R.id.fragmentContainerView);
         } else {
-            showFragment(EditNoteFragment.newInstance(note), R.id.fragmentContainerView3);
+            showFragment(EditNoteFragment.newInstance(note, position), R.id.fragmentContainerView3);
+        }
+    }
+
+    @Override
+    public void showAddNote() {
+        NoteDataClass emptyNote = new NoteDataClass("", "", "", "");
+        noteSource.addNoteData(emptyNote);
+        publisher.notify(noteSource);
+        if (isPortrait()) {
+            showFragment(EditNoteFragment.newInstance(noteSource, noteSource.size() - 1), R.id.fragmentContainerView);
+        } else {
+            showFragment(EditNoteFragment.newInstance(noteSource, noteSource.size() - 1), R.id.fragmentContainerView3);
         }
     }
 
@@ -106,56 +124,32 @@ public class MainActivity extends AppCompatActivity implements INavigator {
             return false;
         });
         getSupportFragmentManager().addOnBackStackChangedListener(() -> toggle.setDrawerIndicatorEnabled(!canGoBack() || !isPortrait()));
-        toggle.setToolbarNavigationClickListener(v -> {
-                    if (canGoBack()) {
-                        getSupportFragmentManager().popBackStack();
-                    } else {
-                        drawer.openDrawer(GravityCompat.START);
-                    }
-                }
-        );
+        toggle.setToolbarNavigationClickListener(v -> onBackPressed());
     }
 
     private boolean canGoBack() {
-        return getSupportFragmentManager().getBackStackEntryCount() > 1;
+        return (getSupportFragmentManager().getBackStackEntryCount() > 1);
+    }
+
+    private boolean isEditFragmentCurrent() {
+        List<Fragment> fragments = getSupportFragmentManager().getFragments();
+        for (Fragment fragment : fragments) {
+            if (canGoBack() && fragment != null && fragment.isVisible() && fragment instanceof EditNoteFragment) {
+                return ((EditNoteFragment) fragment).onBackPress();
+            }
+        }
+        return false;
     }
 
     @Override
     public void onBackPressed() {
-        if (!canGoBack() && isPortrait()) {
-            finish();
-        } else {
-            super.onBackPressed();
+        if (isPortrait()) {
+            if (canGoBack() && !isEditFragmentCurrent()) {
+                super.onBackPressed();
+            } else if (!canGoBack()) {
+                finish();
+            }
         }
-    }
-
-    private Toolbar initToolbar() {
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        toolbar.inflateMenu(R.menu.main);
-
-        final MenuItem search = toolbar.getMenu().findItem(R.id.action_search);
-        SearchView searchText = (SearchView) search.getActionView();
-
-        searchText.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-            @Override
-            public boolean onQueryTextSubmit(String query) {
-                Toast.makeText(MainActivity.this, query, Toast.LENGTH_SHORT).show();
-                return true;
-            }
-
-            @Override
-            public boolean onQueryTextChange(String newText) {
-                return true;
-            }
-        });
-
-        toolbar.setOnMenuItemClickListener(item -> {
-            int id = item.getItemId();
-
-            return navigateFragment(id);
-        });
-
-        return toolbar;
     }
 
     @SuppressLint("NonConstantResourceId")
@@ -164,10 +158,6 @@ public class MainActivity extends AppCompatActivity implements INavigator {
         if (id == R.id.action_settings) {
             Toast.makeText(MainActivity.this, id + "there might be settings fragment", Toast.LENGTH_SHORT).show();
         }
-        if (id == R.id.action_add) {
-            Toast.makeText(MainActivity.this, id + "there might be adding note fragment", Toast.LENGTH_SHORT).show();
-        }
-
         if (id == R.id.action_about) {
             Toast.makeText(MainActivity.this, id + "there might be information about application", Toast.LENGTH_SHORT).show();
         }
@@ -200,4 +190,8 @@ public class MainActivity extends AppCompatActivity implements INavigator {
         }
     }
 
+    @Override
+    public Toolbar requireToolbar() {
+        return toolbar;
+    }
 }

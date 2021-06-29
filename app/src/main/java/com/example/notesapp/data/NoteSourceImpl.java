@@ -35,6 +35,21 @@ public class NoteSourceImpl implements NoteSource, Parcelable {
     }
 
     @Override
+    public void deleteNoteData(int position) {
+        noteSource.remove(position);
+    }
+
+    @Override
+    public void updateNoteData(int position, NoteDataClass noteData) {
+        noteSource.set(position, noteData);
+    }
+
+    @Override
+    public void addNoteData(NoteDataClass noteData) {
+        noteSource.add(noteData);
+    }
+
+    @Override
     public int size() {
         return noteSource.size();
     }

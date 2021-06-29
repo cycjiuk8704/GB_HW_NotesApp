@@ -4,5 +4,9 @@
     <dimen name="text_field_text_size">24sp</dimen>
     <dimen name="nav_header_height">400dp</dimen>
     <dimen name="nav_header_dimen">32sp</dimen>
-    <dimen name="marginDrawer">25dp</dimen>
+    <dimen name="margin_drawer">25dp</dimen>
+    <dimen name="margin_note">10dp</dimen>
+    <dimen name="item_name_width">150dp</dimen>
+    <dimen name="item_description_width">250dp</dimen>
+    <dimen name="detail_name_width">250dp</dimen>
 </resources>

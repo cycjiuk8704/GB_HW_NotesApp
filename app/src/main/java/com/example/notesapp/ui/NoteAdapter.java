@@ -17,6 +17,7 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.ViewHolder> {
     private OnItemClickListener itemClickListener;
     private OnLongItemClickListener longItemClickListener;
 
+    private int menuPosition;
     private NoteSource noteSource;
 
     public NoteAdapter(NoteSource noteSource) {
@@ -59,9 +60,9 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.ViewHolder> {
 
     public class ViewHolder extends RecyclerView.ViewHolder {
 
-        private TextView name;
-        private TextView description;
-        private TextView date;
+        private final TextView name;
+        private final TextView description;
+        private final TextView date;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -69,24 +70,20 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.ViewHolder> {
             description = itemView.findViewById(R.id.noteDescription);
             date = itemView.findViewById(R.id.noteDate);
 
-            itemView.setOnLongClickListener(new View.OnLongClickListener() {
-                @Override
-                public boolean onLongClick(View v) {
-                    if (longItemClickListener != null) {
-                        longItemClickListener.onLongItemClick(v, getAdapterPosition());
-                    }
-                    return false;
+            itemView.setOnLongClickListener(v -> {
+                if (longItemClickListener != null) {
+                    longItemClickListener.onLongItemClick(v, getAdapterPosition());
+                    menuPosition = getAdapterPosition();
                 }
+                return false;
             });
 
-            itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if (itemClickListener != null) {
-                        itemClickListener.onItemClick(v, getAdapterPosition());
-                    }
-
+            itemView.setOnClickListener(v -> {
+                if (itemClickListener != null) {
+                    itemClickListener.onItemClick(v, getAdapterPosition());
+                    menuPosition = getAdapterPosition();
                 }
+
             });
         }
 

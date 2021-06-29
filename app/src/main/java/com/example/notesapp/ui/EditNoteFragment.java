@@ -1,47 +1,154 @@
 package com.example.notesapp.ui;
 
+import android.app.DatePickerDialog;
+import android.app.Dialog;
+import android.content.Context;
 import android.os.Bundle;
+import android.text.format.DateUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.widget.Toolbar;
 
+import com.example.notesapp.MainActivity;
 import com.example.notesapp.R;
 import com.example.notesapp.data.NoteDataClass;
+import com.example.notesapp.data.NoteSourceImpl;
+import com.example.notesapp.observe.Publisher;
 
-public class EditNoteFragment extends BaseFragment {
+import java.util.Calendar;
+
+public class EditNoteFragment extends BaseFragment implements IBackPressHandler {
 
     private static final String NOTE_STATE = "state";
+    private static final String NOTE_POSITION = "position";
     private NoteDataClass noteDataClass;
+    private NoteSourceImpl noteSource;
+    private int position;
+    private TextView nameTV;
+    private TextView textTV;
+    private TextView descriptionTV;
+    private TextView dateTV;
+    private final Calendar calendar = Calendar.getInstance();
+    private Publisher<NoteSourceImpl> publisher;
 
-    public static EditNoteFragment newInstance(NoteDataClass noteDataClass) {
-        EditNoteFragment noteTextFragment = new EditNoteFragment();
+    @Override
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+        MainActivity activity = (MainActivity) context;
+        publisher = activity.getPublisher();
+    }
+
+    @Override
+    public void onDetach() {
+        publisher = null;
+        super.onDetach();
+    }
+
+    DatePickerDialog.OnDateSetListener d = (view, year, monthOfYear, dayOfMonth) -> {
+        calendar.set(Calendar.YEAR, year);
+        calendar.set(Calendar.MONTH, monthOfYear);
+        calendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
+        setInitialDate();
+    };
+
+    public static EditNoteFragment newInstance(NoteSourceImpl noteData, int position) {
+        EditNoteFragment noteEditFragment = new EditNoteFragment();
 
         Bundle args = new Bundle();
-        args.putParcelable(NOTE_STATE, noteDataClass);
-        noteTextFragment.setArguments(args);
-        return noteTextFragment;
+        args.putParcelable(NOTE_STATE, noteData);
+        args.putInt(NOTE_POSITION, position);
+        noteEditFragment.setArguments(args);
+        return noteEditFragment;
     }
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+                             Bundle savedInstanceState, @NonNull Toolbar toolbar) {
         if (getArguments() != null) {
-            noteDataClass = getArguments().getParcelable(NOTE_STATE);
+            noteSource = getArguments().getParcelable(NOTE_STATE);
+            position = getArguments().getInt(NOTE_POSITION);
+            noteDataClass = noteSource.getNoteData(position);
         }
+        return initView(inflater, toolbar);
+    }
 
+    @NonNull
+    private View initView(@NonNull LayoutInflater inflater, Toolbar toolbar) {
         View v = inflater.inflate(R.layout.fragment_edit_note, null);
-        TextView nameTV = v.findViewById(R.id.noteEditName);
-        TextView textTV = v.findViewById(R.id.noteEditText);
-        TextView descriptionTV = v.findViewById(R.id.noteEditDescription);
-        TextView dateTV = v.findViewById(R.id.noteEditDate);
+        nameTV = v.findViewById(R.id.noteEditName);
+        textTV = v.findViewById(R.id.noteEditText);
+        descriptionTV = v.findViewById(R.id.noteEditDescription);
+        dateTV = v.findViewById(R.id.noteEditDate);
         nameTV.setText(noteDataClass.getName());
         textTV.setText(noteDataClass.getNoteText());
         descriptionTV.setText(noteDataClass.getDescription());
-        dateTV.setText(noteDataClass.getDateOfCreation());
+        if (noteDataClass.getDateOfCreation().equals("")) {
+            setInitialDate();
+        } else {
+            dateTV.setText(noteDataClass.getDateOfCreation());
+        }
+        setupToolbar(toolbar);
+
+        dateTV.setOnClickListener(this::setDate);
+
+        Button buttonSave = v.findViewById(R.id.buttonSaveEdit);
+        buttonSave.setOnClickListener(v1 -> {
+            noteSource.updateNoteData(position, new NoteDataClass(nameTV.getText().toString(), descriptionTV.getText().toString(), dateTV.getText().toString(), textTV.getText().toString()));
+            publisher.notify(noteSource);
+            requireActivity().getSupportFragmentManager().popBackStack();
+        });
 
         return v;
+
+
     }
+
+    protected void setupToolbar(Toolbar toolbar) {
+        toolbar.inflateMenu(R.menu.main_edit_frag);
+    }
+
+    private void setInitialDate() {
+
+        dateTV.setText(DateUtils.formatDateTime(getContext(),
+                calendar.getTimeInMillis(), DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_SHOW_YEAR));
+    }
+
+    public void setDate(View v) {
+        new DatePickerDialog(getContext(), d,
+                calendar.get(Calendar.YEAR),
+                calendar.get(Calendar.MONTH),
+                calendar.get(Calendar.DAY_OF_MONTH))
+                .show();
+    }
+
+    @Override
+    public boolean onBackPress() {
+        quitDialog().show();
+        return true;
+    }
+
+    private Dialog quitDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(requireActivity());
+        builder.setTitle(R.string.edit_note_quit_dialog_title).setMessage(R.string.edit_note_quit_dialog_msg)
+                .setPositiveButton(R.string.yes, (dialog, which) -> {
+                    if (noteDataClass.getName().equals("") && noteDataClass.getDateOfCreation().equals("") &&
+                            noteDataClass.getDescription().equals("") && noteDataClass.getNoteText().equals("")) {
+                        NoteSourceImpl noteSourceTemp = new NoteSourceImpl(noteSource.getNoteSource());
+                        noteSourceTemp.deleteNoteData(position);
+                        noteSource = noteSourceTemp;
+                        publisher.notify(noteSourceTemp);
+                    }
+                    requireActivity().getSupportFragmentManager().popBackStack();
+                    dialog.dismiss();
+                })
+                .setNegativeButton(R.string.no, (dialog, which) -> dialog.cancel());
+        return builder.create();
+    }
+
 }
