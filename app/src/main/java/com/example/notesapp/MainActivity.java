@@ -14,30 +14,43 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 
+import com.example.notesapp.data.NoteDataClass;
+import com.example.notesapp.data.NoteSourceImpl;
+import com.example.notesapp.ui.EditNoteFragment;
+import com.example.notesapp.ui.INavigator;
+import com.example.notesapp.ui.NoteListFragment;
+import com.example.notesapp.ui.NoteTextFragment;
 import com.google.android.material.navigation.NavigationView;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class MainActivity extends AppCompatActivity implements INavigator {
+
+    private NoteSourceImpl noteSource;
+    private List<NoteDataClass> noteData;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        clearBackStack();
+        initData();
         setContentView(R.layout.activity_main);
         Toolbar toolbar = initToolbar();
         initDrawer(toolbar);
 
-        NoteDataClass noteOne = new NoteDataClass("note1", "someNoteDescription1", "date", "there might be your text");
-
-        showNotes(noteOne);
+        showNotes(noteSource);
 
         if (!isPortrait()) {
-            showNoteDetails(noteOne);
+            showNoteDetails(noteSource.getNoteData(0));
         }
 
     }
 
     @Override
-    public void showNotes(@NonNull NoteDataClass note) {
+    public void showNotes(@NonNull NoteSourceImpl note) {
         if (isPortrait()) {
             showFragment(NoteListFragment.newInstance(note), R.id.fragmentContainerView);
         } else {
@@ -55,6 +68,15 @@ public class MainActivity extends AppCompatActivity implements INavigator {
             showFragment(NoteTextFragment.newInstance(note), R.id.fragmentContainerView);
         } else {
             showFragment(NoteTextFragment.newInstance(note), R.id.fragmentContainerView3);
+        }
+    }
+
+    @Override
+    public void showEditNoteDetails(@NonNull NoteDataClass note) {
+        if (isPortrait()) {
+            showFragment(EditNoteFragment.newInstance(note), R.id.fragmentContainerView);
+        } else {
+            showFragment(EditNoteFragment.newInstance(note), R.id.fragmentContainerView3);
         }
     }
 
@@ -83,7 +105,7 @@ public class MainActivity extends AppCompatActivity implements INavigator {
             }
             return false;
         });
-        getSupportFragmentManager().addOnBackStackChangedListener(() -> toggle.setDrawerIndicatorEnabled(!canGoBack()));
+        getSupportFragmentManager().addOnBackStackChangedListener(() -> toggle.setDrawerIndicatorEnabled(!canGoBack() || !isPortrait()));
         toggle.setToolbarNavigationClickListener(v -> {
                     if (canGoBack()) {
                         getSupportFragmentManager().popBackStack();
@@ -100,7 +122,7 @@ public class MainActivity extends AppCompatActivity implements INavigator {
 
     @Override
     public void onBackPressed() {
-        if (!canGoBack()) {
+        if (!canGoBack() && isPortrait()) {
             finish();
         } else {
             super.onBackPressed();
@@ -150,6 +172,32 @@ public class MainActivity extends AppCompatActivity implements INavigator {
             Toast.makeText(MainActivity.this, id + "there might be information about application", Toast.LENGTH_SHORT).show();
         }
         return true;
+    }
+
+    private void initData() {
+        noteData = new ArrayList<NoteDataClass>() {
+            {
+                add(new NoteDataClass("note1", "description1", "date1", "some text 1"));
+                add(new NoteDataClass("note2", "description2", "date2", "some text 2"));
+                add(new NoteDataClass("note3", "description3", "date3", "some text 3"));
+                add(new NoteDataClass("note4", "description4", "date4", "some text 4"));
+                add(new NoteDataClass("note5", "description5", "date5", "some text 5"));
+                add(new NoteDataClass("note6", "description6", "date6", "some text 6"));
+                add(new NoteDataClass("note7", "description7", "date7", "some text 7"));
+                add(new NoteDataClass("note8", "description8", "date8", "some text 8"));
+                add(new NoteDataClass("note9", "description9", "date9", "some text 9"));
+                add(new NoteDataClass("note10", "description10", "date10", "some text 10"));
+            }
+        };
+        noteSource = new NoteSourceImpl(noteData);
+    }
+
+    private void clearBackStack() {
+        FragmentManager manager = getSupportFragmentManager();
+        if (manager.getBackStackEntryCount() > 0) {
+            FragmentManager.BackStackEntry first = manager.getBackStackEntryAt(0);
+            manager.popBackStack(first.getId(), FragmentManager.POP_BACK_STACK_INCLUSIVE);
+        }
     }
 
 }

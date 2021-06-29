@@ -1,4 +1,4 @@
-package com.example.notesapp;
+package com.example.notesapp.ui;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -7,6 +7,9 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+
+import com.example.notesapp.R;
+import com.example.notesapp.data.NoteDataClass;
 
 public class NoteTextFragment extends BaseFragment {
 
@@ -30,10 +33,14 @@ public class NoteTextFragment extends BaseFragment {
         }
 
         View v = inflater.inflate(R.layout.fragment_note_text, null);
-        TextView nameTV = (TextView) v.findViewById(R.id.noteName);
-        TextView textTV = (TextView) v.findViewById(R.id.noteText);
+        TextView nameTV = v.findViewById(R.id.noteDetailName);
+        TextView textTV = v.findViewById(R.id.noteText);
+        TextView descriptionTV = v.findViewById(R.id.noteDetailDescription);
+        TextView dateTV = v.findViewById(R.id.noteDetailDate);
         nameTV.setText(noteDataClass.getName());
         textTV.setText(noteDataClass.getNoteText());
+        descriptionTV.setText(noteDataClass.getDescription());
+        dateTV.setText(noteDataClass.getDateOfCreation());
 
         return v;
     }
