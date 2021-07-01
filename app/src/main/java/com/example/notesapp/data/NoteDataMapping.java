@@ -1,7 +1,5 @@
 package com.example.notesapp.data;
 
-import com.google.firebase.Timestamp;
-
 import java.util.HashMap;
 import java.util.Map;
 
@@ -14,10 +12,9 @@ public class NoteDataMapping {
     }
 
     public static NoteDataClass toNoteData(String id, Map<String, Object> doc) {
-        Timestamp timeStamp = (Timestamp) doc.get(Fields.DATE);
         NoteDataClass answer = new NoteDataClass((String) doc.get(Fields.NAME),
                 (String) doc.get(Fields.DESCRIPTION),
-                timeStamp.toDate().toString(),
+                (String) doc.get(Fields.DATE),
                 (String) doc.get(Fields.NOTE_TEXT));
         answer.setId(id);
         return answer;

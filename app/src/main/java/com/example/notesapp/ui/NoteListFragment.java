@@ -39,9 +39,10 @@ public class NoteListFragment extends BaseFragment {
         public void updateValue(@NonNull NoteSource value) {
 //            assert getArguments() != null;
 //            getArguments().putParcelable(LIST_STATE, value);
+            adapter.notifyDataSetChanged();
 
-            data.updateNoteData(data.getNoteData(menuPosition));
-            adapter.notifyItemChanged(menuPosition);
+//            data.updateNoteData(data.getNoteData(menuPosition));
+//            adapter.notifyItemChanged(menuPosition);
         }
     };
 
