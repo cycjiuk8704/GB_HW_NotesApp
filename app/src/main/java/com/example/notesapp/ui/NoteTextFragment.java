@@ -14,8 +14,7 @@ import androidx.appcompat.widget.Toolbar;
 import com.example.notesapp.MainActivity;
 import com.example.notesapp.R;
 import com.example.notesapp.data.NoteDataClass;
-import com.example.notesapp.data.NoteSourceFirebaseImpl;
-import com.example.notesapp.data.NoteSourceImpl;
+import com.example.notesapp.data.NoteSource;
 import com.example.notesapp.observe.Observer;
 import com.example.notesapp.observe.Publisher;
 
@@ -24,23 +23,23 @@ public class NoteTextFragment extends BaseFragment {
     private static final String NOTE_STATE = "state";
     private static final String NOTE_POSITION = "position";
     private NoteDataClass noteDataClass;
-    private NoteSourceImpl noteData;
     private int position;
     private TextView nameTV;
     private TextView textTV;
     private TextView descriptionTV;
     private TextView dateTV;
-    private Publisher<NoteSourceFirebaseImpl> publisher;
-    private final Observer<NoteSourceFirebaseImpl> observer = value -> {
+    private Publisher<NoteSource> publisher;
+    private final Observer<NoteSource> observer = value -> {
         assert getArguments() != null;
         getArguments().putParcelable(NOTE_STATE, new NoteDataClass(nameTV.getText().toString(), descriptionTV.getText().toString(),
                 dateTV.getText().toString(), textTV.getText().toString()));
     };
 
-    public static NoteTextFragment newInstance(NoteDataClass noteDataClass) {
+    public static NoteTextFragment newInstance(NoteDataClass noteDataClass, int position) {
         NoteTextFragment noteTextFragment = new NoteTextFragment();
         Bundle args = new Bundle();
         args.putParcelable(NOTE_STATE, noteDataClass);
+        args.putInt(NOTE_POSITION, position);
         noteTextFragment.setArguments(args);
         return noteTextFragment;
     }

@@ -20,7 +20,6 @@ import com.example.notesapp.R;
 import com.example.notesapp.data.NoteDataClass;
 import com.example.notesapp.data.NoteSource;
 import com.example.notesapp.data.NoteSourceFirebaseImpl;
-import com.example.notesapp.data.NoteSourceImpl;
 import com.example.notesapp.data.NoteSourceResponse;
 import com.example.notesapp.observe.Observer;
 import com.example.notesapp.observe.Publisher;
@@ -31,17 +30,17 @@ public class NoteListFragment extends BaseFragment {
 
     private static final String LIST_STATE = "state";
     private List<NoteDataClass> noteData;
-    private NoteSourceImpl noteSource;
     private NoteSource data;
     private int menuPosition;
     private NoteAdapter adapter;
-    private Publisher<NoteSourceFirebaseImpl> publisher;
-    private final Observer<NoteSourceFirebaseImpl> observer = new Observer<NoteSourceFirebaseImpl>() {
+    private Publisher<NoteSource> publisher;
+    private final Observer<NoteSource> observer = new Observer<NoteSource>() {
         @Override
-        public void updateValue(@NonNull NoteSourceFirebaseImpl value) {
+        public void updateValue(@NonNull NoteSource value) {
 //            assert getArguments() != null;
 //            getArguments().putParcelable(LIST_STATE, value);
-            data.updateNoteData(menuPosition, data.getNoteData(menuPosition));
+
+            data.updateNoteData(data.getNoteData(menuPosition));
             adapter.notifyItemChanged(menuPosition);
         }
     };
@@ -71,22 +70,21 @@ public class NoteListFragment extends BaseFragment {
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState, @NonNull Toolbar toolbar) {
 
-        if (getArguments() != null) {
-            noteSource = getArguments().getParcelable(LIST_STATE);
-            noteData = noteSource.getNoteSource();
-        }
+//        if (getArguments() != null) {
+//            noteSource = getArguments().getParcelable(LIST_STATE);
+//            noteData = noteSource.getNoteSource();
+//        }
         publisher.subscribe(observer);
-        noteSource = new NoteSourceImpl(noteData);
         View v = inflater.inflate(R.layout.fragment_note_list, null);
-        RecyclerView recyclerView = v.findViewById(R.id.recycler_view_lines);
-        initRecyclerView(recyclerView, noteSource);
-        setupToolbar(toolbar);
         data = new NoteSourceFirebaseImpl().init(new NoteSourceResponse() {
             @Override
             public void initialized(NoteSource NoteData) {
                 adapter.notifyDataSetChanged();
             }
         });
+        RecyclerView recyclerView = v.findViewById(R.id.recycler_view_lines);
+        initRecyclerView(recyclerView, data);
+        setupToolbar(toolbar);
         adapter.setDataSource(data);
         return v;
     }
@@ -102,7 +100,7 @@ public class NoteListFragment extends BaseFragment {
                 data.deleteNoteData(position);
                 adapter.notifyItemRemoved(position);
             } else if (id == R.id.open_popup) {
-                requireNavigator().showNoteDetails(data.getNoteData(position));
+                requireNavigator().showNoteDetails(data.getNoteData(position), position);
             } else if (id == R.id.edit_popup) {
                 requireNavigator().showEditNoteDetails(data.getNoteData(position), position);
             }
@@ -132,7 +130,7 @@ public class NoteListFragment extends BaseFragment {
         });
 
         adapter.SetOnItemClickListener((view, position) -> {
-            requireNavigator().showNoteDetails(data.getNoteData(position));
+            requireNavigator().showNoteDetails(data.getNoteData(position), position);
             menuPosition = position;
         });
     }

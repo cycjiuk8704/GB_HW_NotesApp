@@ -65,7 +65,7 @@ public class NoteSourceFirebaseImpl implements NoteSource {
     }
 
     @Override
-    public void updateNoteData(int position, NoteDataClass noteData) {
+    public void updateNoteData(NoteDataClass noteData) {
         String id = noteData.getId();
         collection.document(id).set(NoteDataMapping.toDocument(noteData));
 
@@ -83,5 +83,9 @@ public class NoteSourceFirebaseImpl implements NoteSource {
             return 0;
         }
         return notesData.size();
+    }
+
+    public List<NoteDataClass> getNoteSource() {
+        return notesData;
     }
 }
