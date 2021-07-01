@@ -19,7 +19,9 @@ import com.example.notesapp.MainActivity;
 import com.example.notesapp.R;
 import com.example.notesapp.data.NoteDataClass;
 import com.example.notesapp.data.NoteSource;
+import com.example.notesapp.data.NoteSourceFirebaseImpl;
 import com.example.notesapp.data.NoteSourceImpl;
+import com.example.notesapp.data.NoteSourceResponse;
 import com.example.notesapp.observe.Observer;
 import com.example.notesapp.observe.Publisher;
 
@@ -30,25 +32,27 @@ public class NoteListFragment extends BaseFragment {
     private static final String LIST_STATE = "state";
     private List<NoteDataClass> noteData;
     private NoteSourceImpl noteSource;
+    private NoteSource data;
     private int menuPosition;
     private NoteAdapter adapter;
-    private Publisher<NoteSourceImpl> publisher;
-    private final Observer<NoteSourceImpl> observer = new Observer<NoteSourceImpl>() {
+    private Publisher<NoteSourceFirebaseImpl> publisher;
+    private final Observer<NoteSourceFirebaseImpl> observer = new Observer<NoteSourceFirebaseImpl>() {
         @Override
-        public void updateValue(@NonNull NoteSourceImpl value) {
-            assert getArguments() != null;
-            getArguments().putParcelable(LIST_STATE, value);
+        public void updateValue(@NonNull NoteSourceFirebaseImpl value) {
+//            assert getArguments() != null;
+//            getArguments().putParcelable(LIST_STATE, value);
+            data.updateNoteData(menuPosition, data.getNoteData(menuPosition));
             adapter.notifyItemChanged(menuPosition);
         }
     };
 
-    public static NoteListFragment newInstance(NoteSourceImpl noteData) {
-        NoteListFragment n = new NoteListFragment();
-        Bundle args = new Bundle();
-        args.putParcelable(LIST_STATE, noteData);
-        n.setArguments(args);
-        return n;
-    }
+//    public static NoteListFragment newInstance(NoteSourceImpl noteData) {
+//        NoteListFragment n = new NoteListFragment();
+//        Bundle args = new Bundle();
+//        args.putParcelable(LIST_STATE, noteData);
+//        n.setArguments(args);
+//        return n;
+//    }
 
     @Override
     public void onAttach(@NonNull Context context) {
@@ -77,6 +81,13 @@ public class NoteListFragment extends BaseFragment {
         RecyclerView recyclerView = v.findViewById(R.id.recycler_view_lines);
         initRecyclerView(recyclerView, noteSource);
         setupToolbar(toolbar);
+        data = new NoteSourceFirebaseImpl().init(new NoteSourceResponse() {
+            @Override
+            public void initialized(NoteSource NoteData) {
+                adapter.notifyDataSetChanged();
+            }
+        });
+        adapter.setDataSource(data);
         return v;
     }
 
@@ -88,12 +99,12 @@ public class NoteListFragment extends BaseFragment {
             if (id == R.id.add_popup) {
                 addNewNote();
             } else if (id == R.id.delete_popup) {
-                noteSource.deleteNoteData(position);
+                data.deleteNoteData(position);
                 adapter.notifyItemRemoved(position);
             } else if (id == R.id.open_popup) {
-                requireNavigator().showNoteDetails(noteSource, position);
+                requireNavigator().showNoteDetails(data.getNoteData(position));
             } else if (id == R.id.edit_popup) {
-                requireNavigator().showEditNoteDetails(noteSource, position);
+                requireNavigator().showEditNoteDetails(data.getNoteData(position), position);
             }
             return true;
         });
@@ -101,8 +112,8 @@ public class NoteListFragment extends BaseFragment {
     }
 
     private void addNewNote() {
-        requireNavigator().showAddNote();
-        menuPosition = noteSource.size();
+        requireNavigator().showAddNote(new NoteDataClass("", "", "", ""), data.size());
+        menuPosition = data.size();
     }
 
     private void initRecyclerView(RecyclerView recyclerView, NoteSource data) {
@@ -112,7 +123,7 @@ public class NoteListFragment extends BaseFragment {
         LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(layoutManager);
 
-        adapter = new NoteAdapter(data);
+        adapter = new NoteAdapter();
         recyclerView.setAdapter(adapter);
 
         adapter.SetOnLongItemClickListener((view, position) -> {
@@ -121,7 +132,7 @@ public class NoteListFragment extends BaseFragment {
         });
 
         adapter.SetOnItemClickListener((view, position) -> {
-            requireNavigator().showNoteDetails(noteSource, position);
+            requireNavigator().showNoteDetails(data.getNoteData(position));
             menuPosition = position;
         });
     }
@@ -156,3 +167,5 @@ public class NoteListFragment extends BaseFragment {
         });
     }
 }
+
+

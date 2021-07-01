@@ -4,6 +4,8 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 public class NoteDataClass implements Parcelable {
+
+    private String id;
     private final String name;
     private final String description;
     private final String dateOfCreation;
@@ -49,6 +51,14 @@ public class NoteDataClass implements Parcelable {
 
     public String getNoteText() {
         return noteText;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     @Override

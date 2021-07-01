@@ -20,8 +20,7 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.ViewHolder> {
     private int menuPosition;
     private NoteSource noteSource;
 
-    public NoteAdapter(NoteSource noteSource) {
-        this.noteSource = noteSource;
+    public NoteAdapter() {
     }
 
     @NonNull
@@ -92,7 +91,10 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.ViewHolder> {
             description.setText(noteData.getDescription());
             date.setText(noteData.getDateOfCreation());
         }
+    }
 
+    public void setDataSource(NoteSource noteSource) {
+        this.noteSource = noteSource;
     }
 }
 

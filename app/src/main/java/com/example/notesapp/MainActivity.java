@@ -15,6 +15,8 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
 import com.example.notesapp.data.NoteDataClass;
+import com.example.notesapp.data.NoteSource;
+import com.example.notesapp.data.NoteSourceFirebaseImpl;
 import com.example.notesapp.data.NoteSourceImpl;
 import com.example.notesapp.observe.Publisher;
 import com.example.notesapp.ui.EditNoteFragment;
@@ -24,43 +26,51 @@ import com.example.notesapp.ui.NoteListFragment;
 import com.example.notesapp.ui.NoteTextFragment;
 import com.google.android.material.navigation.NavigationView;
 
+import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class MainActivity extends AppCompatActivity implements INavigator, IToolbarHolder {
 
     private NoteSourceImpl noteSource;
     private List<NoteDataClass> noteData;
+    private NoteSource data;
     private Toolbar toolbar;
-    private final Publisher<NoteSourceImpl> publisher = new Publisher<>();
+    private final Publisher<NoteSourceFirebaseImpl> publisher = new Publisher<>();
 
-    public Publisher<NoteSourceImpl> getPublisher() {
+    public Publisher<NoteSourceFirebaseImpl> getPublisher() {
         return publisher;
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        try {
+            Logger.getLogger("TAG").log(Level.SEVERE, sha1AsString("sha"));
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
         clearBackStack();
         initData();
         setContentView(R.layout.activity_main);
         toolbar = findViewById(R.id.toolbar);
         initDrawer(toolbar);
 
-        showNotes(noteSource);
-
-        if (!isPortrait()) {
-            showNoteDetails(noteSource, 0);
-        }
+        showNotes();
 
     }
 
     @Override
-    public void showNotes(@NonNull NoteSourceImpl note) {
+    public void showNotes() {
         if (isPortrait()) {
-            showFragment(NoteListFragment.newInstance(note), R.id.fragmentContainerView);
+            showFragment(new NoteListFragment(), R.id.fragmentContainerView);
         } else {
-            showFragment(NoteListFragment.newInstance(note), R.id.fragmentContainerView2);
+            showFragment(new NoteListFragment(), R.id.fragmentContainerView2);
         }
     }
 
@@ -69,16 +79,16 @@ public class MainActivity extends AppCompatActivity implements INavigator, ITool
     }
 
     @Override
-    public void showNoteDetails(@NonNull NoteSourceImpl note, int position) {
+    public void showNoteDetails(@NonNull NoteDataClass note) {
         if (isPortrait()) {
-            showFragment(NoteTextFragment.newInstance(note, position), R.id.fragmentContainerView);
+            showFragment(NoteTextFragment.newInstance(note), R.id.fragmentContainerView);
         } else {
-            showFragment(NoteTextFragment.newInstance(note, position), R.id.fragmentContainerView3);
+            showFragment(NoteTextFragment.newInstance(note), R.id.fragmentContainerView3);
         }
     }
 
     @Override
-    public void showEditNoteDetails(@NonNull NoteSourceImpl note, int position) {
+    public void showEditNoteDetails(@NonNull NoteDataClass note, int position) {
         if (isPortrait()) {
             showFragment(EditNoteFragment.newInstance(note, position), R.id.fragmentContainerView);
         } else {
@@ -87,14 +97,11 @@ public class MainActivity extends AppCompatActivity implements INavigator, ITool
     }
 
     @Override
-    public void showAddNote() {
-        NoteDataClass emptyNote = new NoteDataClass("", "", "", "");
-        noteSource.addNoteData(emptyNote);
-        publisher.notify(noteSource);
+    public void showAddNote(NoteDataClass note, int position) {
         if (isPortrait()) {
-            showFragment(EditNoteFragment.newInstance(noteSource, noteSource.size() - 1), R.id.fragmentContainerView);
+            showFragment(EditNoteFragment.newInstance(note, position), R.id.fragmentContainerView);
         } else {
-            showFragment(EditNoteFragment.newInstance(noteSource, noteSource.size() - 1), R.id.fragmentContainerView3);
+            showFragment(EditNoteFragment.newInstance(note, position), R.id.fragmentContainerView3);
         }
     }
 
@@ -194,4 +201,16 @@ public class MainActivity extends AppCompatActivity implements INavigator, ITool
     public Toolbar requireToolbar() {
         return toolbar;
     }
+
+    public static byte[] sha1(@NonNull String str) throws NoSuchAlgorithmException {
+        final MessageDigest digest = MessageDigest.getInstance("SHA-1");
+        digest.update(str.getBytes(StandardCharsets.UTF_8));
+
+        return digest.digest();
+    }
+
+    public static String sha1AsString(@NonNull String str) throws NoSuchAlgorithmException {
+        return String.format("%X", ByteBuffer.wrap(sha1(str)).getLong());
+    }
 }
+

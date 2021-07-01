@@ -14,6 +14,7 @@ import androidx.appcompat.widget.Toolbar;
 import com.example.notesapp.MainActivity;
 import com.example.notesapp.R;
 import com.example.notesapp.data.NoteDataClass;
+import com.example.notesapp.data.NoteSourceFirebaseImpl;
 import com.example.notesapp.data.NoteSourceImpl;
 import com.example.notesapp.observe.Observer;
 import com.example.notesapp.observe.Publisher;
@@ -29,18 +30,17 @@ public class NoteTextFragment extends BaseFragment {
     private TextView textTV;
     private TextView descriptionTV;
     private TextView dateTV;
-    private Publisher<NoteSourceImpl> publisher;
-    private final Observer<NoteSourceImpl> observer = value -> {
+    private Publisher<NoteSourceFirebaseImpl> publisher;
+    private final Observer<NoteSourceFirebaseImpl> observer = value -> {
         assert getArguments() != null;
-        getArguments().putParcelable(NOTE_STATE, value);
+        getArguments().putParcelable(NOTE_STATE, new NoteDataClass(nameTV.getText().toString(), descriptionTV.getText().toString(),
+                dateTV.getText().toString(), textTV.getText().toString()));
     };
 
-    public static NoteTextFragment newInstance(NoteSourceImpl noteData, int position) {
+    public static NoteTextFragment newInstance(NoteDataClass noteDataClass) {
         NoteTextFragment noteTextFragment = new NoteTextFragment();
-
         Bundle args = new Bundle();
-        args.putParcelable(NOTE_STATE, noteData);
-        args.putInt(NOTE_POSITION, position);
+        args.putParcelable(NOTE_STATE, noteDataClass);
         noteTextFragment.setArguments(args);
         return noteTextFragment;
     }
@@ -69,9 +69,7 @@ public class NoteTextFragment extends BaseFragment {
                              Bundle savedInstanceState, @NonNull Toolbar toolbar) {
 
         if (getArguments() != null) {
-            noteData = getArguments().getParcelable(NOTE_STATE);
-            position = getArguments().getInt(NOTE_POSITION);
-            noteDataClass = noteData.getNoteData(position);
+            noteDataClass = getArguments().getParcelable(NOTE_STATE);
         }
         publisher.subscribe(observer);
         View v = inflater.inflate(R.layout.fragment_note_text, null);
@@ -80,14 +78,6 @@ public class NoteTextFragment extends BaseFragment {
         descriptionTV = v.findViewById(R.id.noteDetailDescription);
         dateTV = v.findViewById(R.id.noteDetailDate);
         initTextView(noteDataClass);
-//        publisher.subscribe(new Observer() {
-//            @Override
-//            public void updateData(NoteDataClass noteData) {
-//                noteDataClass = noteData;
-//                getArguments().putParcelable(NOTE_STATE, noteDataClass);
-//                initTextView(noteData);
-//            }
-//        });
 
         setupToolbar(toolbar);
         return v;
@@ -107,11 +97,21 @@ public class NoteTextFragment extends BaseFragment {
             if (id == R.id.action_settings) {
                 Toast.makeText(getContext(), id + "there might be settings fragment", Toast.LENGTH_SHORT).show();
             } else if (id == R.id.action_edit) {
-                requireNavigator().showEditNoteDetails(noteData, position);
+                requireNavigator().showEditNoteDetails(noteDataClass, position);
 
 
             }
             return true;
         });
+    }
+
+    private NoteDataClass collectNoteData() {
+        if (noteDataClass != null) {
+            NoteDataClass answer = noteDataClass;
+            answer.setId(noteDataClass.getId());
+            return answer;
+        } else {
+            return new NoteDataClass(nameTV.getText().toString(), descriptionTV.getText().toString(), dateTV.getText().toString(), textTV.getText().toString());
+        }
     }
 }

@@ -13,6 +13,14 @@ public class NoteSourceImpl implements NoteSource, Parcelable {
         this.noteSource = noteSource;
     }
 
+    public NoteSourceImpl init(NoteSourceResponse noteSourceResponse) {
+        noteSource.add(new NoteDataClass("", "", "", ""));
+        if (noteSourceResponse != null) {
+            noteSourceResponse.initialized(this);
+        }
+        return this;
+    }
+
     protected NoteSourceImpl(Parcel in) {
         noteSource = in.createTypedArrayList(NoteDataClass.CREATOR);
     }

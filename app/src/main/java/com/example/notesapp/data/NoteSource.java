@@ -1,6 +1,8 @@
 package com.example.notesapp.data;
 
 public interface NoteSource {
+    NoteSource init(NoteSourceResponse noteSourceResponse);
+
     NoteDataClass getNoteData(int position);
     void deleteNoteData(int position);
     void updateNoteData(int position, NoteDataClass noteData);
