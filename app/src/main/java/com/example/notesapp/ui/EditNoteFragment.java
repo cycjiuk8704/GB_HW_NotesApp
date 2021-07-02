@@ -60,7 +60,6 @@ public class EditNoteFragment extends BaseFragment implements IBackPressHandler 
         EditNoteFragment noteEditFragment = new EditNoteFragment();
         Bundle args = new Bundle();
         args.putParcelable(NOTE_STATE, noteData);
-//        args.putInt(NOTE_POSITION, position);
         noteEditFragment.setArguments(args);
         return noteEditFragment;
     }

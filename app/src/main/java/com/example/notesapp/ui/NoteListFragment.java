@@ -1,5 +1,6 @@
 package com.example.notesapp.ui;
 
+import android.app.Dialog;
 import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -9,6 +10,7 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.PopupMenu;
 import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
@@ -69,8 +71,7 @@ public class NoteListFragment extends BaseFragment {
             if (id == R.id.add_popup) {
                 addNewNote();
             } else if (id == R.id.delete_popup) {
-                data.deleteNoteData(position);
-                adapter.notifyItemRemoved(position);
+                deleteDialog(position).show();
             } else if (id == R.id.open_popup) {
                 requireNavigator().showNoteDetails(data.getNoteData(position));
             } else if (id == R.id.edit_popup) {
@@ -127,6 +128,18 @@ public class NoteListFragment extends BaseFragment {
             }
             return true;
         });
+    }
+
+    private Dialog deleteDialog(int position) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(requireActivity());
+        builder.setTitle(R.string.delete_note_title).setMessage(R.string.delete_note_msg)
+                .setPositiveButton(R.string.yes, (dialog, which) -> {
+                    data.deleteNoteData(position);
+                    adapter.notifyItemRemoved(position);
+                    dialog.dismiss();
+                })
+                .setNegativeButton(R.string.no, (dialog, which) -> dialog.cancel());
+        return builder.create();
     }
 }
 
