@@ -19,36 +19,21 @@ import com.example.notesapp.MainActivity;
 import com.example.notesapp.R;
 import com.example.notesapp.data.NoteDataClass;
 import com.example.notesapp.data.NoteSource;
-import com.example.notesapp.data.NoteSourceImpl;
+import com.example.notesapp.data.NoteSourceFirebaseImpl;
 import com.example.notesapp.observe.Observer;
 import com.example.notesapp.observe.Publisher;
 
-import java.util.List;
-
 public class NoteListFragment extends BaseFragment {
 
-    private static final String LIST_STATE = "state";
-    private List<NoteDataClass> noteData;
-    private NoteSourceImpl noteSource;
-    private int menuPosition;
+    private NoteSource data;
     private NoteAdapter adapter;
-    private Publisher<NoteSourceImpl> publisher;
-    private final Observer<NoteSourceImpl> observer = new Observer<NoteSourceImpl>() {
+    private Publisher<NoteSource> publisher;
+    private final Observer<NoteSource> observer = new Observer<NoteSource>() {
         @Override
-        public void updateValue(@NonNull NoteSourceImpl value) {
-            assert getArguments() != null;
-            getArguments().putParcelable(LIST_STATE, value);
-            adapter.notifyItemChanged(menuPosition);
+        public void updateValue(@NonNull NoteSource value) {
+            adapter.notifyDataSetChanged();
         }
     };
-
-    public static NoteListFragment newInstance(NoteSourceImpl noteData) {
-        NoteListFragment n = new NoteListFragment();
-        Bundle args = new Bundle();
-        args.putParcelable(LIST_STATE, noteData);
-        n.setArguments(args);
-        return n;
-    }
 
     @Override
     public void onAttach(@NonNull Context context) {
@@ -66,17 +51,13 @@ public class NoteListFragment extends BaseFragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState, @NonNull Toolbar toolbar) {
-
-        if (getArguments() != null) {
-            noteSource = getArguments().getParcelable(LIST_STATE);
-            noteData = noteSource.getNoteSource();
-        }
         publisher.subscribe(observer);
-        noteSource = new NoteSourceImpl(noteData);
         View v = inflater.inflate(R.layout.fragment_note_list, null);
+        data = new NoteSourceFirebaseImpl().init(NoteData -> adapter.notifyDataSetChanged());
         RecyclerView recyclerView = v.findViewById(R.id.recycler_view_lines);
-        initRecyclerView(recyclerView, noteSource);
+        initRecyclerView(recyclerView, data);
         setupToolbar(toolbar);
+        adapter.setDataSource(data);
         return v;
     }
 
@@ -88,12 +69,12 @@ public class NoteListFragment extends BaseFragment {
             if (id == R.id.add_popup) {
                 addNewNote();
             } else if (id == R.id.delete_popup) {
-                noteSource.deleteNoteData(position);
+                data.deleteNoteData(position);
                 adapter.notifyItemRemoved(position);
             } else if (id == R.id.open_popup) {
-                requireNavigator().showNoteDetails(noteSource, position);
+                requireNavigator().showNoteDetails(data.getNoteData(position));
             } else if (id == R.id.edit_popup) {
-                requireNavigator().showEditNoteDetails(noteSource, position);
+                requireNavigator().showEditNoteDetails(data.getNoteData(position));
             }
             return true;
         });
@@ -101,8 +82,7 @@ public class NoteListFragment extends BaseFragment {
     }
 
     private void addNewNote() {
-        requireNavigator().showAddNote();
-        menuPosition = noteSource.size();
+        requireNavigator().showAddNote(new NoteDataClass("", "", "", ""));
     }
 
     private void initRecyclerView(RecyclerView recyclerView, NoteSource data) {
@@ -112,18 +92,12 @@ public class NoteListFragment extends BaseFragment {
         LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(layoutManager);
 
-        adapter = new NoteAdapter(data);
+        adapter = new NoteAdapter();
         recyclerView.setAdapter(adapter);
 
-        adapter.SetOnLongItemClickListener((view, position) -> {
-            initPopUpMenu(view, position);
-            menuPosition = position;
-        });
+        adapter.SetOnLongItemClickListener(this::initPopUpMenu);
 
-        adapter.SetOnItemClickListener((view, position) -> {
-            requireNavigator().showNoteDetails(noteSource, position);
-            menuPosition = position;
-        });
+        adapter.SetOnItemClickListener((view, position) -> requireNavigator().showNoteDetails(data.getNoteData(position)));
     }
 
     protected void setupToolbar(Toolbar toolbar) {
@@ -151,8 +125,9 @@ public class NoteListFragment extends BaseFragment {
             } else if (id == R.id.action_add) {
                 addNewNote();
             }
-
             return true;
         });
     }
 }
+
+

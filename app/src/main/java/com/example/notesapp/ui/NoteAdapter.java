@@ -17,11 +17,9 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.ViewHolder> {
     private OnItemClickListener itemClickListener;
     private OnLongItemClickListener longItemClickListener;
 
-    private int menuPosition;
     private NoteSource noteSource;
 
-    public NoteAdapter(NoteSource noteSource) {
-        this.noteSource = noteSource;
+    public NoteAdapter() {
     }
 
     @NonNull
@@ -73,7 +71,6 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.ViewHolder> {
             itemView.setOnLongClickListener(v -> {
                 if (longItemClickListener != null) {
                     longItemClickListener.onLongItemClick(v, getAdapterPosition());
-                    menuPosition = getAdapterPosition();
                 }
                 return false;
             });
@@ -81,7 +78,6 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.ViewHolder> {
             itemView.setOnClickListener(v -> {
                 if (itemClickListener != null) {
                     itemClickListener.onItemClick(v, getAdapterPosition());
-                    menuPosition = getAdapterPosition();
                 }
 
             });
@@ -92,7 +88,10 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.ViewHolder> {
             description.setText(noteData.getDescription());
             date.setText(noteData.getDateOfCreation());
         }
+    }
 
+    public void setDataSource(NoteSource noteSource) {
+        this.noteSource = noteSource;
     }
 }
 
