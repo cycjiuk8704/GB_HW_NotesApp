@@ -30,9 +30,10 @@ public class NoteTextFragment extends BaseFragment {
     private TextView dateTV;
     private Publisher<NoteSource> publisher;
     private final Observer<NoteSource> observer = value -> {
-        assert getArguments() != null;
-        getArguments().putParcelable(NOTE_STATE, new NoteDataClass(nameTV.getText().toString(), descriptionTV.getText().toString(),
-                dateTV.getText().toString(), textTV.getText().toString()));
+
+//        assert getArguments() != null;
+//        getArguments().putParcelable(NOTE_STATE, new NoteDataClass(nameTV.getText().toString(), descriptionTV.getText().toString(),
+//                dateTV.getText().toString(), textTV.getText().toString()));
     };
 
     public static NoteTextFragment newInstance(NoteDataClass noteDataClass, int position) {

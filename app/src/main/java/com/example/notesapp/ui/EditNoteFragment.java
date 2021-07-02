@@ -155,7 +155,11 @@ public class EditNoteFragment extends BaseFragment implements IBackPressHandler 
     }
 
     private NoteDataClass collectNoteData() {
-        return new NoteDataClass(nameTV.getText().toString(), descriptionTV.getText().toString(), dateTV.getText().toString(), textTV.getText().toString());
+        noteDataClass.setName(nameTV.getText().toString());
+        noteDataClass.setDescription(descriptionTV.getText().toString());
+        noteDataClass.setDateOfCreation(dateTV.getText().toString());
+        noteDataClass.setNoteText(textTV.getText().toString());
+        return noteDataClass;
     }
 
 }
