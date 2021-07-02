@@ -21,26 +21,19 @@ import com.example.notesapp.observe.Publisher;
 public class NoteTextFragment extends BaseFragment {
 
     private static final String NOTE_STATE = "state";
-//    private static final String NOTE_POSITION = "position";
     private NoteDataClass noteDataClass;
-    //    private int position;
     private TextView nameTV;
     private TextView textTV;
     private TextView descriptionTV;
     private TextView dateTV;
     private Publisher<NoteSource> publisher;
     private final Observer<NoteSource> observer = value -> {
-
-//        assert getArguments() != null;
-//        getArguments().putParcelable(NOTE_STATE, new NoteDataClass(nameTV.getText().toString(), descriptionTV.getText().toString(),
-//                dateTV.getText().toString(), textTV.getText().toString()));
     };
 
     public static NoteTextFragment newInstance(NoteDataClass noteDataClass) {
         NoteTextFragment noteTextFragment = new NoteTextFragment();
         Bundle args = new Bundle();
         args.putParcelable(NOTE_STATE, noteDataClass);
-//        args.putInt(NOTE_POSITION, position);
         noteTextFragment.setArguments(args);
         return noteTextFragment;
     }
