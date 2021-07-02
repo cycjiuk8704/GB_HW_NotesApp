@@ -20,7 +20,6 @@ import com.example.notesapp.R;
 import com.example.notesapp.data.NoteDataClass;
 import com.example.notesapp.data.NoteSource;
 import com.example.notesapp.data.NoteSourceFirebaseImpl;
-import com.example.notesapp.data.NoteSourceResponse;
 import com.example.notesapp.observe.Publisher;
 
 import java.util.Calendar;
@@ -28,10 +27,8 @@ import java.util.Calendar;
 public class EditNoteFragment extends BaseFragment implements IBackPressHandler {
 
     private static final String NOTE_STATE = "state";
-    private static final String NOTE_POSITION = "position";
     private NoteDataClass noteDataClass;
     private NoteSource noteSource;
-    private int position;
     private TextView nameTV;
     private TextView textTV;
     private TextView descriptionTV;
@@ -59,11 +56,11 @@ public class EditNoteFragment extends BaseFragment implements IBackPressHandler 
         setInitialDate();
     };
 
-    public static EditNoteFragment newInstance(NoteDataClass noteData, int position) {
+    public static EditNoteFragment newInstance(NoteDataClass noteData) {
         EditNoteFragment noteEditFragment = new EditNoteFragment();
         Bundle args = new Bundle();
         args.putParcelable(NOTE_STATE, noteData);
-        args.putInt(NOTE_POSITION, position);
+//        args.putInt(NOTE_POSITION, position);
         noteEditFragment.setArguments(args);
         return noteEditFragment;
     }
@@ -73,13 +70,9 @@ public class EditNoteFragment extends BaseFragment implements IBackPressHandler 
                              Bundle savedInstanceState, @NonNull Toolbar toolbar) {
         if (getArguments() != null) {
             noteDataClass = getArguments().getParcelable(NOTE_STATE);
-            position = getArguments().getInt(NOTE_POSITION);
         }
-        noteSource = new NoteSourceFirebaseImpl().init(new NoteSourceResponse() {
-            @Override
-            public void initialized(NoteSource noteData) {
+        noteSource = new NoteSourceFirebaseImpl().init(noteData -> {
 
-            }
         });
         return initView(inflater, toolbar);
     }

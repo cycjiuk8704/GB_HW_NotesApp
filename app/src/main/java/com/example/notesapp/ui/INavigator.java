@@ -8,10 +8,10 @@ public interface INavigator {
 
     void showNotes();
 
-    void showNoteDetails(@NonNull NoteDataClass note, int position);
+    void showNoteDetails(@NonNull NoteDataClass note);
 
-    void showEditNoteDetails(@NonNull NoteDataClass noteDataClass, int position);
+    void showEditNoteDetails(@NonNull NoteDataClass noteDataClass);
 
-    void showAddNote(NoteDataClass noteDataClass, int position);
+    void showAddNote(NoteDataClass noteDataClass);
 
 }

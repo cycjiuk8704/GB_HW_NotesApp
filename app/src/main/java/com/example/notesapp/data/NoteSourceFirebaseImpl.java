@@ -3,15 +3,10 @@ package com.example.notesapp.data;
 import android.annotation.SuppressLint;
 import android.util.Log;
 
-import androidx.annotation.NonNull;
-
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,31 +16,27 @@ import java.util.Objects;
 public class NoteSourceFirebaseImpl implements NoteSource {
     private static final String CARDS_COLLECTION = "cards";
     private static final String TAG = "[CardsSourceFirebaseImpl]";
-    private FirebaseFirestore store = FirebaseFirestore.getInstance();
-    private CollectionReference collection = store.collection(CARDS_COLLECTION);
-    private List<NoteDataClass> notesData = new ArrayList<NoteDataClass>();
+    private final FirebaseFirestore store = FirebaseFirestore.getInstance();
+    private final CollectionReference collection = store.collection(CARDS_COLLECTION);
+    private List<NoteDataClass> notesData = new ArrayList<>();
 
     @SuppressLint("LongLogTag")
     @Override
     public NoteSource init(final NoteSourceResponse noteSourceResponse) {
         collection.orderBy(NoteDataMapping.Fields.DATE, Query.Direction.DESCENDING).get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                    @SuppressLint("LongLogTag")
-                    @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        if (task.isSuccessful()) {
-                            notesData = new ArrayList<NoteDataClass>();
-                            for (QueryDocumentSnapshot document : Objects.requireNonNull(task.getResult())) {
-                                Map<String, Object> doc = document.getData();
-                                String id = document.getId();
-                                NoteDataClass noteData = NoteDataMapping.toNoteData(id, doc);
-                                notesData.add(noteData);
-                            }
-                            Log.d(TAG, "success " + notesData.size() + " qnt");
-                            noteSourceResponse.initialized(NoteSourceFirebaseImpl.this);
-                        } else {
-                            Log.d(TAG, "get failed with ", task.getException());
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        notesData = new ArrayList<>();
+                        for (QueryDocumentSnapshot document : Objects.requireNonNull(task.getResult())) {
+                            Map<String, Object> doc = document.getData();
+                            String id = document.getId();
+                            NoteDataClass noteData = NoteDataMapping.toNoteData(id, doc);
+                            notesData.add(noteData);
                         }
+                        Log.d(TAG, "success " + notesData.size() + " qnt");
+                        noteSourceResponse.initialized(NoteSourceFirebaseImpl.this);
+                    } else {
+                        Log.d(TAG, "get failed with ", task.getException());
                     }
                 })
                 .addOnFailureListener(e -> Log.d(TAG, "get failed with ", e));
@@ -83,9 +74,5 @@ public class NoteSourceFirebaseImpl implements NoteSource {
             return 0;
         }
         return notesData.size();
-    }
-
-    public List<NoteDataClass> getNoteSource() {
-        return notesData;
     }
 }

@@ -21,9 +21,9 @@ import com.example.notesapp.observe.Publisher;
 public class NoteTextFragment extends BaseFragment {
 
     private static final String NOTE_STATE = "state";
-    private static final String NOTE_POSITION = "position";
+//    private static final String NOTE_POSITION = "position";
     private NoteDataClass noteDataClass;
-    private int position;
+    //    private int position;
     private TextView nameTV;
     private TextView textTV;
     private TextView descriptionTV;
@@ -36,11 +36,11 @@ public class NoteTextFragment extends BaseFragment {
 //                dateTV.getText().toString(), textTV.getText().toString()));
     };
 
-    public static NoteTextFragment newInstance(NoteDataClass noteDataClass, int position) {
+    public static NoteTextFragment newInstance(NoteDataClass noteDataClass) {
         NoteTextFragment noteTextFragment = new NoteTextFragment();
         Bundle args = new Bundle();
         args.putParcelable(NOTE_STATE, noteDataClass);
-        args.putInt(NOTE_POSITION, position);
+//        args.putInt(NOTE_POSITION, position);
         noteTextFragment.setArguments(args);
         return noteTextFragment;
     }
@@ -97,21 +97,11 @@ public class NoteTextFragment extends BaseFragment {
             if (id == R.id.action_settings) {
                 Toast.makeText(getContext(), id + "there might be settings fragment", Toast.LENGTH_SHORT).show();
             } else if (id == R.id.action_edit) {
-                requireNavigator().showEditNoteDetails(noteDataClass, position);
+                requireNavigator().showEditNoteDetails(noteDataClass);
 
 
             }
             return true;
         });
-    }
-
-    private NoteDataClass collectNoteData() {
-        if (noteDataClass != null) {
-            NoteDataClass answer = noteDataClass;
-            answer.setId(noteDataClass.getId());
-            return answer;
-        } else {
-            return new NoteDataClass(nameTV.getText().toString(), descriptionTV.getText().toString(), dateTV.getText().toString(), textTV.getText().toString());
-        }
     }
 }

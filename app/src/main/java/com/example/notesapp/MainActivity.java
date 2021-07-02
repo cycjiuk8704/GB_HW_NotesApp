@@ -34,8 +34,6 @@ import java.util.logging.Logger;
 
 public class MainActivity extends AppCompatActivity implements INavigator, IToolbarHolder {
 
-    private List<NoteDataClass> noteData;
-    private NoteSource data;
     private Toolbar toolbar;
     private final Publisher<NoteSource> publisher = new Publisher<>();
 
@@ -75,29 +73,29 @@ public class MainActivity extends AppCompatActivity implements INavigator, ITool
     }
 
     @Override
-    public void showNoteDetails(@NonNull NoteDataClass note, int position) {
+    public void showNoteDetails(@NonNull NoteDataClass note) {
         if (isPortrait()) {
-            showFragment(NoteTextFragment.newInstance(note, position), R.id.fragmentContainerView);
+            showFragment(NoteTextFragment.newInstance(note), R.id.fragmentContainerView);
         } else {
-            showFragment(NoteTextFragment.newInstance(note, position), R.id.fragmentContainerView3);
+            showFragment(NoteTextFragment.newInstance(note), R.id.fragmentContainerView3);
         }
     }
 
     @Override
-    public void showEditNoteDetails(@NonNull NoteDataClass note, int position) {
+    public void showEditNoteDetails(@NonNull NoteDataClass note) {
         if (isPortrait()) {
-            showFragment(EditNoteFragment.newInstance(note, position), R.id.fragmentContainerView);
+            showFragment(EditNoteFragment.newInstance(note), R.id.fragmentContainerView);
         } else {
-            showFragment(EditNoteFragment.newInstance(note, position), R.id.fragmentContainerView3);
+            showFragment(EditNoteFragment.newInstance(note), R.id.fragmentContainerView3);
         }
     }
 
     @Override
-    public void showAddNote(NoteDataClass note, int position) {
+    public void showAddNote(NoteDataClass note) {
         if (isPortrait()) {
-            showFragment(EditNoteFragment.newInstance(note, position), R.id.fragmentContainerView);
+            showFragment(EditNoteFragment.newInstance(note), R.id.fragmentContainerView);
         } else {
-            showFragment(EditNoteFragment.newInstance(note, position), R.id.fragmentContainerView3);
+            showFragment(EditNoteFragment.newInstance(note), R.id.fragmentContainerView3);
         }
     }
 
