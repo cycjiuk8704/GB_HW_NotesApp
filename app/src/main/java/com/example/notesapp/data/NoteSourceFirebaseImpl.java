@@ -1,0 +1,78 @@
+package com.example.notesapp.data;
+
+import android.annotation.SuppressLint;
+import android.util.Log;
+
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+
+public class NoteSourceFirebaseImpl implements NoteSource {
+    private static final String CARDS_COLLECTION = "cards";
+    private static final String TAG = "[CardsSourceFirebaseImpl]";
+    private final FirebaseFirestore store = FirebaseFirestore.getInstance();
+    private final CollectionReference collection = store.collection(CARDS_COLLECTION);
+    private List<NoteDataClass> notesData = new ArrayList<>();
+
+    @SuppressLint("LongLogTag")
+    @Override
+    public NoteSource init(final NoteSourceResponse noteSourceResponse) {
+        collection.orderBy(NoteDataMapping.Fields.DATE, Query.Direction.DESCENDING).get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        notesData = new ArrayList<>();
+                        for (QueryDocumentSnapshot document : Objects.requireNonNull(task.getResult())) {
+                            Map<String, Object> doc = document.getData();
+                            String id = document.getId();
+                            NoteDataClass noteData = NoteDataMapping.toNoteData(id, doc);
+                            notesData.add(noteData);
+                        }
+                        Log.d(TAG, "success " + notesData.size() + " qnt");
+                        noteSourceResponse.initialized(NoteSourceFirebaseImpl.this);
+                    } else {
+                        Log.d(TAG, "get failed with ", task.getException());
+                    }
+                })
+                .addOnFailureListener(e -> Log.d(TAG, "get failed with ", e));
+        return this;
+    }
+
+    @Override
+    public NoteDataClass getNoteData(int position) {
+        return notesData.get(position);
+    }
+
+    @Override
+    public void deleteNoteData(int position) {
+        collection.document(notesData.get(position).getId()).delete();
+        notesData.remove(position);
+
+    }
+
+    @Override
+    public void updateNoteData(NoteDataClass noteData) {
+        String id = noteData.getId();
+        collection.document(id).set(NoteDataMapping.toDocument(noteData));
+
+    }
+
+    @Override
+    public void addNoteData(NoteDataClass noteData) {
+        collection.add(NoteDataMapping.toDocument(noteData)).addOnSuccessListener(documentReference -> noteData.setId(documentReference.getId()));
+
+    }
+
+    @Override
+    public int size() {
+        if (notesData == null) {
+            return 0;
+        }
+        return notesData.size();
+    }
+}

@@ -15,7 +15,7 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
 import com.example.notesapp.data.NoteDataClass;
-import com.example.notesapp.data.NoteSourceImpl;
+import com.example.notesapp.data.NoteSource;
 import com.example.notesapp.observe.Publisher;
 import com.example.notesapp.ui.EditNoteFragment;
 import com.example.notesapp.ui.INavigator;
@@ -24,43 +24,46 @@ import com.example.notesapp.ui.NoteListFragment;
 import com.example.notesapp.ui.NoteTextFragment;
 import com.google.android.material.navigation.NavigationView;
 
-import java.util.ArrayList;
+import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class MainActivity extends AppCompatActivity implements INavigator, IToolbarHolder {
 
-    private NoteSourceImpl noteSource;
-    private List<NoteDataClass> noteData;
     private Toolbar toolbar;
-    private final Publisher<NoteSourceImpl> publisher = new Publisher<>();
+    private final Publisher<NoteSource> publisher = new Publisher<>();
 
-    public Publisher<NoteSourceImpl> getPublisher() {
+    public Publisher<NoteSource> getPublisher() {
         return publisher;
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        try {
+            Logger.getLogger("TAG").log(Level.SEVERE, sha1AsString("sha"));
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
         clearBackStack();
-        initData();
         setContentView(R.layout.activity_main);
         toolbar = findViewById(R.id.toolbar);
         initDrawer(toolbar);
 
-        showNotes(noteSource);
-
-        if (!isPortrait()) {
-            showNoteDetails(noteSource, 0);
-        }
+        showNotes();
 
     }
 
     @Override
-    public void showNotes(@NonNull NoteSourceImpl note) {
+    public void showNotes() {
         if (isPortrait()) {
-            showFragment(NoteListFragment.newInstance(note), R.id.fragmentContainerView);
+            showFragment(new NoteListFragment(), R.id.fragmentContainerView);
         } else {
-            showFragment(NoteListFragment.newInstance(note), R.id.fragmentContainerView2);
+            showFragment(new NoteListFragment(), R.id.fragmentContainerView2);
         }
     }
 
@@ -69,32 +72,29 @@ public class MainActivity extends AppCompatActivity implements INavigator, ITool
     }
 
     @Override
-    public void showNoteDetails(@NonNull NoteSourceImpl note, int position) {
+    public void showNoteDetails(@NonNull NoteDataClass note) {
         if (isPortrait()) {
-            showFragment(NoteTextFragment.newInstance(note, position), R.id.fragmentContainerView);
+            showFragment(NoteTextFragment.newInstance(note), R.id.fragmentContainerView);
         } else {
-            showFragment(NoteTextFragment.newInstance(note, position), R.id.fragmentContainerView3);
+            showFragment(NoteTextFragment.newInstance(note), R.id.fragmentContainerView3);
         }
     }
 
     @Override
-    public void showEditNoteDetails(@NonNull NoteSourceImpl note, int position) {
+    public void showEditNoteDetails(@NonNull NoteDataClass note) {
         if (isPortrait()) {
-            showFragment(EditNoteFragment.newInstance(note, position), R.id.fragmentContainerView);
+            showFragment(EditNoteFragment.newInstance(note), R.id.fragmentContainerView);
         } else {
-            showFragment(EditNoteFragment.newInstance(note, position), R.id.fragmentContainerView3);
+            showFragment(EditNoteFragment.newInstance(note), R.id.fragmentContainerView3);
         }
     }
 
     @Override
-    public void showAddNote() {
-        NoteDataClass emptyNote = new NoteDataClass("", "", "", "");
-        noteSource.addNoteData(emptyNote);
-        publisher.notify(noteSource);
+    public void showAddNote(NoteDataClass note) {
         if (isPortrait()) {
-            showFragment(EditNoteFragment.newInstance(noteSource, noteSource.size() - 1), R.id.fragmentContainerView);
+            showFragment(EditNoteFragment.newInstance(note), R.id.fragmentContainerView);
         } else {
-            showFragment(EditNoteFragment.newInstance(noteSource, noteSource.size() - 1), R.id.fragmentContainerView3);
+            showFragment(EditNoteFragment.newInstance(note), R.id.fragmentContainerView3);
         }
     }
 
@@ -164,24 +164,6 @@ public class MainActivity extends AppCompatActivity implements INavigator, ITool
         return true;
     }
 
-    private void initData() {
-        noteData = new ArrayList<NoteDataClass>() {
-            {
-                add(new NoteDataClass("note1", "description1", "date1", "some text 1"));
-                add(new NoteDataClass("note2", "description2", "date2", "some text 2"));
-                add(new NoteDataClass("note3", "description3", "date3", "some text 3"));
-                add(new NoteDataClass("note4", "description4", "date4", "some text 4"));
-                add(new NoteDataClass("note5", "description5", "date5", "some text 5"));
-                add(new NoteDataClass("note6", "description6", "date6", "some text 6"));
-                add(new NoteDataClass("note7", "description7", "date7", "some text 7"));
-                add(new NoteDataClass("note8", "description8", "date8", "some text 8"));
-                add(new NoteDataClass("note9", "description9", "date9", "some text 9"));
-                add(new NoteDataClass("note10", "description10", "date10", "some text 10"));
-            }
-        };
-        noteSource = new NoteSourceImpl(noteData);
-    }
-
     private void clearBackStack() {
         FragmentManager manager = getSupportFragmentManager();
         if (manager.getBackStackEntryCount() > 0) {
@@ -194,4 +176,16 @@ public class MainActivity extends AppCompatActivity implements INavigator, ITool
     public Toolbar requireToolbar() {
         return toolbar;
     }
+
+    public static byte[] sha1(@NonNull String str) throws NoSuchAlgorithmException {
+        final MessageDigest digest = MessageDigest.getInstance("SHA-1");
+        digest.update(str.getBytes(StandardCharsets.UTF_8));
+
+        return digest.digest();
+    }
+
+    public static String sha1AsString(@NonNull String str) throws NoSuchAlgorithmException {
+        return String.format("%X", ByteBuffer.wrap(sha1(str)).getLong());
+    }
 }
+

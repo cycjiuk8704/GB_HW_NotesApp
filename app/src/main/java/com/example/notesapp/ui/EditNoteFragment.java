@@ -18,7 +18,8 @@ import androidx.appcompat.widget.Toolbar;
 import com.example.notesapp.MainActivity;
 import com.example.notesapp.R;
 import com.example.notesapp.data.NoteDataClass;
-import com.example.notesapp.data.NoteSourceImpl;
+import com.example.notesapp.data.NoteSource;
+import com.example.notesapp.data.NoteSourceFirebaseImpl;
 import com.example.notesapp.observe.Publisher;
 
 import java.util.Calendar;
@@ -26,16 +27,14 @@ import java.util.Calendar;
 public class EditNoteFragment extends BaseFragment implements IBackPressHandler {
 
     private static final String NOTE_STATE = "state";
-    private static final String NOTE_POSITION = "position";
     private NoteDataClass noteDataClass;
-    private NoteSourceImpl noteSource;
-    private int position;
+    private NoteSource noteSource;
     private TextView nameTV;
     private TextView textTV;
     private TextView descriptionTV;
     private TextView dateTV;
     private final Calendar calendar = Calendar.getInstance();
-    private Publisher<NoteSourceImpl> publisher;
+    private Publisher<NoteSource> publisher;
 
     @Override
     public void onAttach(@NonNull Context context) {
@@ -57,12 +56,10 @@ public class EditNoteFragment extends BaseFragment implements IBackPressHandler 
         setInitialDate();
     };
 
-    public static EditNoteFragment newInstance(NoteSourceImpl noteData, int position) {
+    public static EditNoteFragment newInstance(NoteDataClass noteData) {
         EditNoteFragment noteEditFragment = new EditNoteFragment();
-
         Bundle args = new Bundle();
         args.putParcelable(NOTE_STATE, noteData);
-        args.putInt(NOTE_POSITION, position);
         noteEditFragment.setArguments(args);
         return noteEditFragment;
     }
@@ -71,10 +68,11 @@ public class EditNoteFragment extends BaseFragment implements IBackPressHandler 
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState, @NonNull Toolbar toolbar) {
         if (getArguments() != null) {
-            noteSource = getArguments().getParcelable(NOTE_STATE);
-            position = getArguments().getInt(NOTE_POSITION);
-            noteDataClass = noteSource.getNoteData(position);
+            noteDataClass = getArguments().getParcelable(NOTE_STATE);
         }
+        noteSource = new NoteSourceFirebaseImpl().init(noteData -> {
+
+        });
         return initView(inflater, toolbar);
     }
 
@@ -99,7 +97,11 @@ public class EditNoteFragment extends BaseFragment implements IBackPressHandler 
 
         Button buttonSave = v.findViewById(R.id.buttonSaveEdit);
         buttonSave.setOnClickListener(v1 -> {
-            noteSource.updateNoteData(position, new NoteDataClass(nameTV.getText().toString(), descriptionTV.getText().toString(), dateTV.getText().toString(), textTV.getText().toString()));
+            if (noteDataClass.getId() != null) {
+                noteSource.updateNoteData(collectNoteData());
+            } else {
+                noteSource.addNoteData(collectNoteData());
+            }
             publisher.notify(noteSource);
             requireActivity().getSupportFragmentManager().popBackStack();
         });
@@ -137,18 +139,19 @@ public class EditNoteFragment extends BaseFragment implements IBackPressHandler 
         AlertDialog.Builder builder = new AlertDialog.Builder(requireActivity());
         builder.setTitle(R.string.edit_note_quit_dialog_title).setMessage(R.string.edit_note_quit_dialog_msg)
                 .setPositiveButton(R.string.yes, (dialog, which) -> {
-                    if (noteDataClass.getName().equals("") && noteDataClass.getDateOfCreation().equals("") &&
-                            noteDataClass.getDescription().equals("") && noteDataClass.getNoteText().equals("")) {
-                        NoteSourceImpl noteSourceTemp = new NoteSourceImpl(noteSource.getNoteSource());
-                        noteSourceTemp.deleteNoteData(position);
-                        noteSource = noteSourceTemp;
-                        publisher.notify(noteSourceTemp);
-                    }
                     requireActivity().getSupportFragmentManager().popBackStack();
                     dialog.dismiss();
                 })
                 .setNegativeButton(R.string.no, (dialog, which) -> dialog.cancel());
         return builder.create();
+    }
+
+    private NoteDataClass collectNoteData() {
+        noteDataClass.setName(nameTV.getText().toString());
+        noteDataClass.setDescription(descriptionTV.getText().toString());
+        noteDataClass.setDateOfCreation(dateTV.getText().toString());
+        noteDataClass.setNoteText(textTV.getText().toString());
+        return noteDataClass;
     }
 
 }
